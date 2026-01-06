@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 load_dotenv()
-load_dotenv("backend.env")
 from typing import Optional, Dict, Any
 import random
 import json
@@ -8,9 +7,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from services.serpapi_search import search_local_lenders, normalize_lenders
-
 from wrapper import ask_chatgpt
-from services.serpapi_search import search_local_lenders, normalize_lenders
 from supabase import create_client
 import os
 from datetime import date, datetime
@@ -32,6 +29,9 @@ class ChatRequest(BaseModel):
     message: Optional[str] = None      # chat question OR legacy deal text
     deal: Optional[Dict[str, Any]] = None  # preferred for deal mode
 app = FastAPI()
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 SUPPORTED_ACTIONS = {
     "stress_test",
@@ -754,7 +754,7 @@ def compare_lenders_serpapi(deal: Dict[str, Any]) -> Dict[str, Any]:
     location = f"{city}, {state}".strip().strip(",")
     query = f"hard money lender {location}"
 
-    results = serpapi_local_search(query=query, location=location, num=10)
+    results = search_local_lenders(city, state, num=10)
 
     # light ranking heuristic (v1)
     scored = []
