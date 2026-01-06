@@ -8,14 +8,21 @@ WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 
 
 
-router = APIRouter(prefix="/stripe", tags=["Stripe Webhooks"])
+router = APIRouter(prefix="/webhooks", tags=["Stripe Webhooks"])
 
 PRICE_TO_PLAN = {
-    "price_1SmJFSRIcFNR0I8c5nT67kz9": {"plan": "pro", "monthly_credits": 1000},
-    "price_1SmJGBRIcFNR0I8cS3TEAHpA": {"plan": "premium", "monthly_credits": 3000},
+    "price_1SmfwHEVVGZeraBTZEVOGJS5": {
+        "plan": "pro",
+        "monthly_credits": 1000,
+    },
+    "price_1SmfwXEVVGZeraBTLsrBpEiZ": {
+        "plan": "premium",
+        "monthly_credits": 3000,
+    },
 }
 
-@router.post("/webhook")
+
+@router.post("/stripe")
 async def stripe_webhook(request: Request):
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature")
