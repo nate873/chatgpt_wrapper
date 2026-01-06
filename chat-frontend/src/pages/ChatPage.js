@@ -34,10 +34,7 @@ function formatCurrency(value) {
   return `$${Number(value).toLocaleString()}`;
 }
 
-function formatPercent(value) {
-  if (value === "" || value === null || isNaN(value)) return "-";
-  return `${Number(value).toFixed(1)}%`;
-}
+
 
 const ChatPage = () => {
     const navigate = useNavigate();
@@ -47,8 +44,7 @@ const ChatPage = () => {
   const [showDealPanel, setShowDealPanel] = useState(false);
   const [lastAnalyzedDeal, setLastAnalyzedDeal] = useState(null);
   const [uiMode, setUIMode] = useState("CHAT");
-  const [lenderInsight, setLenderInsight] = useState(null);
-  const [lenderResults, setLenderResults] = useState(null);
+  const [lenderInsight] = useState(null);  
   const [pendingField, setPendingField] = useState(null);
   const [user, setUser] = useState(null);
   const [credits, setCredits] = useState(null);
@@ -62,17 +58,7 @@ const runAction = async (action, overrideDeal = null) => {
     navigate("/pricing-plans");
     return;
   }
-const refreshCredits = async () => {
-  if (!user?.id) return;
 
-  const { data } = await supabase
-    .from("profiles")
-    .select("credits_remaining")
-    .eq("id", user.id)
-    .single();
-
-  if (data) setCredits(data.credits_remaining);
-};
 
   const dealPayload = overrideDeal || lastAnalyzedDeal;
 
@@ -399,28 +385,7 @@ const updatedDeal = {
 
     setIsThinking(true);
 
-    const backendPrompt = `
-You are an experienced hard money lender and fix & flip deal analyst.
-
-Analyze this deal and give:
-- Recommended loan amount
-- LTV on ARV
-- Rate & points
-- Total projected profit ($)
-- ROI (%)
-- Verdict: Strong Deal / Borderline / Weak Deal
-- Short explanation and key risks
-
-Deal details:
-- Address: ${deal.address || "N/A"}
-- Purchase price: ${deal.purchasePrice}
-- Rehab budget: ${deal.rehabBudget || 0}
-- ARV: ${deal.arv}
--- Existing loan balance: ${deal.existingLoanBalance || "none"}
-- Estimated borrower credit score: ${deal.creditScore || "not provided"}
-
-- Experience level: ${deal.experienceLevel}
-`;
+    
         
     try {
       const res = await fetch("http://localhost:8000/api/chat", {
@@ -587,10 +552,6 @@ if (
   runAction("worst_case");
 setFreeformInput("");
 return;
-
-
-  setFreeformInput("");
-  return;
 }
 // ===============================
 // 🌆 CITY OPPORTUNITY ANALYSIS
@@ -677,8 +638,6 @@ if (
   runAction("cash_to_close");
 setFreeformInput("");
 return;
-
-  return;
 }
 // ===============================
 // ⏱ HOLD TIME SENSITIVITY
