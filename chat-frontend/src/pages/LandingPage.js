@@ -33,7 +33,7 @@ const LandingPage = () => {
     }
 
     return () => clearTimeout(timeout);
-  }, [charIndex, isDeleting, phraseIndex]);
+}, [charIndex, isDeleting, phraseIndex, currentPhrase.length]);
 
   const goToLogin = () => {
     window.location.href = "/login";
