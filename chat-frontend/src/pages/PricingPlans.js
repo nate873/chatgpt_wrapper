@@ -90,16 +90,16 @@ const PricingPlans = () => {
 
     try {
      const res = await fetch(
-  `${API_BASE}/stripe/create-checkout-session`,
+  `${API_BASE}/stripe/create-portal-session`,
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      customer_id: data.stripe_customer_id,
+    }),
+  }
+);
 
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            customer_id: data.stripe_customer_id,
-          }),
-        }
-      );
 
       const result = await res.json();
       if (result.url) window.location.href = result.url;
