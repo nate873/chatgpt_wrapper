@@ -4,7 +4,7 @@ import "./PricingPlans.css";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import { supabase } from "../supabaseClient";
-
+const API_BASE = "https://chatgptwrapper-production.up.railway.app";
 const PricingPlans = () => {
   const [user, setUser] = useState(null);
   const [plan, setPlan] = useState("free");
@@ -48,8 +48,9 @@ const PricingPlans = () => {
     if (selectedPlan === plan) return;
 
     try {
-      const res = await fetch(
-        "http://localhost:8000/stripe/create-checkout-session",
+     const res = await fetch(
+  `${API_BASE}/stripe/create-checkout-session`,
+
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -88,8 +89,9 @@ const PricingPlans = () => {
     }
 
     try {
-      const res = await fetch(
-        "http://localhost:8000/stripe/create-portal-session",
+     const res = await fetch(
+  `${API_BASE}/stripe/create-checkout-session`,
+
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

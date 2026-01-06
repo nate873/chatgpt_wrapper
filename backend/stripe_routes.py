@@ -11,15 +11,21 @@ from pydantic import BaseModel
 router = APIRouter(prefix="/stripe", tags=["stripe"])
 
 # -----------------------------
+# Environment
+# -----------------------------
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+FRONTEND_URL = os.getenv("FRONTEND_URL")
+
+if not STRIPE_SECRET_KEY:
+    raise RuntimeError("❌ STRIPE_SECRET_KEY not set")
+
+if not FRONTEND_URL:
+    raise RuntimeError("❌ FRONTEND_URL not set")
+
+# -----------------------------
 # Stripe config
 # -----------------------------
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
-
-if not stripe.api_key:
-    raise RuntimeError(
-        "❌ STRIPE_SECRET_KEY not loaded. Check backend.env and load_dotenv."
-    )
-
+stripe.api_key = STRIPE_SECRET_KEY
 print("✅ Stripe initialized")
 
 # -----------------------------
@@ -48,8 +54,6 @@ class PortalRequest(BaseModel):
 # -----------------------------
 @router.post("/create-checkout-session")
 def create_checkout_session(data: CheckoutRequest):
-    print("📦 Checkout request:", data.dict())
-
     if data.plan not in PRICE_IDS:
         raise HTTPException(status_code=400, detail="Invalid plan")
 
@@ -68,23 +72,22 @@ def create_checkout_session(data: CheckoutRequest):
                 "user_id": data.user_id,
                 "plan": data.plan,
             },
-
-            # ⚠️ MUST MATCH FRONTEND PORT / DOMAIN
-            success_url="http://localhost:3001/chat?success=true",
-            cancel_url="http://localhost:3001/pricing-plans",
+            success_url=f"{FRONTEND_URL}/chat?success=true",
+            cancel_url=f"{FRONTEND_URL}/pricing-plans",
         )
 
-        print("✅ Stripe session created:", session.url)
         return {"url": session.url}
 
     except Exception as e:
-        print("❌ Stripe error:", str(e))
-        raise HTTPException(status_code=500, detail="Stripe checkout failed")
+        print("❌ Stripe checkout error:", str(e))
+        raise HTTPException(
+            status_code=500,
+            detail="Stripe checkout failed"
+        )
 
 
 # -----------------------------
-# Create Stripe Customer Portal Session
-# (Cancel / Update / View Invoices)
+# Create Stripe Billing Portal
 # -----------------------------
 @router.post("/create-portal-session")
 def create_portal_session(data: PortalRequest):
@@ -94,12 +97,14 @@ def create_portal_session(data: PortalRequest):
     try:
         session = stripe.billing_portal.Session.create(
             customer=data.customer_id,
-            return_url="http://localhost:3001/chat",
+            return_url=f"{FRONTEND_URL}/chat",
         )
 
-        print("🔁 Stripe portal session created")
         return {"url": session.url}
 
     except Exception as e:
         print("❌ Stripe portal error:", str(e))
-        raise HTTPException(status_code=500, detail="Unable to open billing portal")
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to open billing portal"
+        )

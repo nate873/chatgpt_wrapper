@@ -52,7 +52,7 @@ const ChatPage = () => {
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login");
   const [activeAction, setActiveAction] = useState(null);
-
+  const API_BASE = "https://chatgptwrapper-production.up.railway.app";
 const runAction = async (action, overrideDeal = null) => {
   if (credits !== null && credits <= 0) {
     navigate("/pricing-plans");
@@ -77,18 +77,21 @@ const runAction = async (action, overrideDeal = null) => {
   setIsThinking(true);
 
   try {
-    const res = await fetch("http://localhost:8000/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        mode: "action",
-        action,
-        deal: {
-          ...dealPayload,
-          userId: user?.id,
-        },
-      }),
-    });
+   const res = await fetch(
+  "https://chatgptwrapper-production.up.railway.app/api/chat",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      mode: "action",
+      action,
+      deal: {
+        ...dealPayload,
+        userId: user?.id,
+      },
+    }),
+  }
+);
 
     const data = await res.json();
 
@@ -234,7 +237,8 @@ useEffect(() => {
   setIsThinking(true);
 
   try {
-    const res = await fetch("http://localhost:8000/api/intake", {
+    const res = await fetch(`${API_BASE}/api/intake`, {
+
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -388,7 +392,8 @@ const updatedDeal = {
     
         
     try {
-      const res = await fetch("http://localhost:8000/api/chat", {
+      const res = await fetch(`${API_BASE}/api/chat`, {
+
         method: "POST",
         headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -448,7 +453,7 @@ const runDSCR = async (updatedDeal) => {
   try {
     setIsThinking(true);
 
-    const res = await fetch("http://localhost:8000/api/chat", {
+    const res = await fetch(`${API_BASE}/api/chat`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -737,7 +742,8 @@ if (
     setIsThinking(true);
 
     try {
-      const res = await fetch("http://localhost:8000/api/chat", {
+    const res = await fetch(`${API_BASE}/api/chat`, {
+
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -835,7 +841,8 @@ if (data.pendingField) {
   setIsThinking(true);
 
   try {
-    const res = await fetch("http://localhost:8000/api/chat", {
+    const res = await fetch(`${API_BASE}/api/chat`, {
+
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
