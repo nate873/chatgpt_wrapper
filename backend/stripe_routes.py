@@ -32,8 +32,8 @@ print("✅ Stripe initialized")
 # Price IDs (TEST MODE)
 # -----------------------------
 PRICE_IDS = {
-    "pro": "price_1SmJFSRIcFNR0I8c5nT67kz9",
-    "premium": "price_1SmJGBRIcFNR0I8cS3TEAHpA",
+    "pro": "price_1SmfwHEVVGZeraBTZEVOGJS5",
+    "premium": "price_1SmfwXEVVGZeraBTLsrBpEiZ",
 }
 
 # -----------------------------
