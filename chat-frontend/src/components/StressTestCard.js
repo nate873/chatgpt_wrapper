@@ -1,7 +1,7 @@
 import React from "react";
 
 function StressTestCard({ data }) {
-  const { base, scenarios, extra_interest_2mo } = data;
+  const { scenarios, extra_interest_2mo } = data;
 
   return (
     <div className="analysis-card">
