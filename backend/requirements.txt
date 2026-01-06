@@ -4,3 +4,4 @@ python-dotenv
 supabase
 stripe
 requests
+openai>=1.0.0
