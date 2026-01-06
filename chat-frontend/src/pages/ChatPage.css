@@ -1,0 +1,977 @@
+/* ========================= */
+/* Layout                    */
+/* ========================= */
+
+.chat-page {
+  height: 100vh;
+  width: 100%;
+  background: #0f0f0f;
+  color: #e5e7eb;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+}
+
+
+
+.chat-shell {
+  display: grid;
+  grid-template-columns: 260px 0 1fr;
+  height: 100%;
+  width: 100%;
+  gap: 0px;
+}
+
+.chat-shell.show-deal {
+  grid-template-columns: 260px 360px 1fr;
+}
+
+
+
+/* ========================= */
+/* Left panel: Deal input    */
+/* ========================= */
+.deal-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+
+  background: #0f0f0f;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+
+  padding: 16px 14px;
+
+  overflow-y: auto;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+
+
+
+
+
+.deal-header h1 {
+  font-size: 1.4rem;
+  margin: 0 0 0.25rem;
+}
+
+.deal-header p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+/* ========================= */
+/* Form                      */
+/* ========================= */
+
+
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-group label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+/* ===== Premium Inputs ===== */
+
+.form-group input,
+.form-group select,
+.chat-input-bar textarea {
+  background: linear-gradient(
+    180deg,
+    #111111,
+    #111111
+  );
+
+  border-radius: 0.85rem;
+  border: 1px solid rgba(55, 65, 81, 0.85);
+
+  padding: 0.75rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #f9fafb;
+
+  outline: none;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 1px 2px rgba(0, 0, 0, 0.35);
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.form-group input::placeholder,
+.chat-input-bar textarea::placeholder {
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.chat-input-bar textarea:focus {
+  border-color: #818cf8;
+  background: rgba(15, 23, 42, 1);
+
+  box-shadow:
+    0 0 0 1px rgba(129, 140, 248, 0.55),
+    0 0 18px rgba(99, 102, 241, 0.25);
+}
+
+/* ========================= */
+/* Form rows                 */
+/* ========================= */
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+/* ========================= */
+/* $ Prefix Inputs           */
+/* ========================= */
+
+.input-prefix {
+  display: flex;
+  align-items: center;
+  border-radius: 0.85rem;
+
+  background: linear-gradient(
+    180deg,
+    #111111
+    #111111
+  );
+
+  border: 1px solid rgba(55, 65, 81, 0.85);
+  overflow: hidden;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.input-prefix span {
+  padding: 0 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #9ca3af;
+  border-right: 1px solid rgba(55, 65, 81, 0.85);
+}
+
+.input-prefix input {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  flex: 1;
+  padding-left: 0.6rem;
+}
+
+/* ========================= */
+/* Buttons                   */
+/* ========================= */
+
+.primary-btn,
+.secondary-btn {
+  border-radius: 999px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+.primary-btn {
+  margin-top: 0.25rem;
+  background: linear-gradient(135deg, #4f46e5, #22c55e);
+  color: #f9fafb;
+  box-shadow: 0 12px 30px rgba(79, 70, 229, 0.4);
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 36px rgba(22, 163, 74, 0.45);
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.secondary-btn {
+  background: rgba(31, 41, 55, 0.9);
+  color: #e5e7eb;
+  border: 1px solid rgba(75, 85, 99, 0.9);
+}
+
+.secondary-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ========================= */
+/* Deal Summary              */
+/* ========================= */
+
+.deal-summary {
+  padding: 0.9rem 1rem;
+  border-radius: 0.9rem;
+  background: radial-gradient(circle at top right, #22c55e22, #020617dd);
+  border: 1px solid rgba(55, 65, 81, 0.9);
+}
+
+/* ========================= */
+/* Chat panel                */
+/* ========================= */
+
+.chat-panel {
+  position: relative; /* REQUIRED */
+  display: flex;
+  flex-direction: column;
+
+  background: #111111;
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+
+  height: 100%;
+  overflow: hidden;
+}
+
+
+
+/* ========================= */
+/* Messages                  */
+/* ========================= */
+
+
+
+.message-bubble {
+  max-width: 90%;
+  padding: 0.7rem 0.85rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+}
+
+
+
+.message-user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #4f46e5, #22c55e);
+  box-shadow: 0 10px 25px rgba(22, 163, 74, 0.4);
+}
+
+/* ========================= */
+/* Chat Input                */
+/* ========================= */
+
+.chat-input-bar {
+  border-top: 1px solid rgba(31, 41, 55, 1);
+  padding-top: 0.75rem;
+}
+
+.chat-input-bar form {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-end;
+}
+
+.chat-input-bar textarea {
+  resize: none;
+  flex: 1;
+  min-height: 2.6rem;
+}
+
+/* ========================= */
+/* Responsive                */
+/* ========================= */
+
+
+
+/* Placeholder fix */
+.deal-panel input::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Focus fix */
+.deal-panel input:focus,
+.deal-panel select:focus {
+  border-color: rgba(148, 163, 184, 0.45);
+  box-shadow: none;
+  background: #161616;
+}
+
+
+
+.deal-panel button,
+/* ========================= */
+/* Analyze Deal Button (Glow Pill) */
+/* ========================= */
+
+.deal-panel .primary-btn {
+  position: relative;
+  width: 100%;
+  height: 44px;
+
+  border-radius: 300px;
+  border: none;
+
+  background: linear-gradient(
+    135deg,
+    #60a5fa,
+    #38bdf8
+  );
+
+  color: #f8fafc;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+
+  cursor: pointer;
+  z-index: 1;
+
+  box-shadow:
+    0 0 0 0 rgba(56, 189, 248, 0.0);
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease;
+}
+
+/* Glow halo */
+.deal-panel .primary-btn::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(96, 165, 250, 0.55),
+    rgba(56, 189, 248, 0.55)
+  );
+
+  filter: blur(10px);
+  opacity: 0.9;
+  z-index: -1;
+}
+
+/* Hover */
+.deal-panel .primary-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+/* Pressed */
+.deal-panel .primary-btn:active:not(:disabled) {
+  transform: translateY(0);
+  filter: brightness(0.98);
+}
+
+/* Disabled (still clean, no ugly gray) */
+.deal-panel .primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.deal-panel .primary-btn:disabled::before {
+  opacity: 0.35;
+}
+
+/* ========================= */
+/* Balanced height + scroll  */
+/* ========================= */
+
+/* Page stays viewport height, but allow inner breathing room */
+
+
+/* Grid fills page but does NOT hard-clip children */
+
+
+
+
+
+/* Keep input usable */
+.chat-input-bar {
+  flex-shrink: 0;
+}
+
+/* Prevent textarea from blowing up layout */
+.chat-input-bar textarea {
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+/* ========================= */
+/* Center chat as main hero  */
+/* ========================= */
+
+
+
+
+
+/* ========================= */
+/* Slide-in Deal Panel       */
+/* ========================= */
+
+/* When deal panel is open */
+.chat-shell.show-deal .deal-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  background: #111111;      /* neutral gray surface */
+  border-radius: 12px;
+
+  padding: 1rem 1.25rem;   /* breathing room without centering */
+}
+
+/* ========================= */
+/* Custom Scrollbar (Chat)   */
+/* ========================= */
+
+/* Width */
+.chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track (background) */
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Thumb (the slider) */
+.chat-messages::-webkit-scrollbar-thumb {
+  background-color: #3a3a3a;      /* neutral gray */
+  border-radius: 999px;           /* pill shape */
+  border: 2px solid transparent;  /* creates padding */
+  background-clip: content-box;
+}
+
+/* Hover state */
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background-color: #555555;
+}
+
+
+
+.deal-panel {
+  grid-column: 2;
+  z-index: 2;
+}
+
+.chat-panel {
+  grid-column: 3;
+  z-index: 1;
+}
+
+
+.deal-panel {
+  background: #0f0f0f;            /* flatter */
+  box-shadow: none;               /* remove depth */
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  padding: 16px 14px;             /* tighter */
+}
+
+
+
+.chat-shell.show-deal .deal-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+
+.deal-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.deal-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.deal-panel::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.35); /* soft gray */
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.deal-panel::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.55);
+}
+
+/* ========================= */
+/* Styled Select (FIX)       */
+/* ========================= */
+
+.styled-select {
+  width: 100%;
+  background: #161616;
+  color: #6b7280; /* placeholder color by default */
+  border: 1px solid rgba(55, 65, 81, 0.85);
+  border-radius: 0.85rem;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* caret */
+  background-image:
+    linear-gradient(45deg, transparent 50%, #9ca3af 50%),
+    linear-gradient(135deg, #9ca3af 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(1em + 2px),
+    calc(100% - 13px) calc(1em + 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+
+/* when a real value is selected */
+.styled-select:not([value=""]) {
+  color: #f9fafb;
+}
+/* Selected value color */
+select.styled-select {
+  color: #9ca3af; /* muted until selected */
+}
+
+/* Once a value is chosen */
+select.styled-select:not([value=""]) {
+  color: #f9fafb;
+}
+
+/* Option text (some browsers honor this) */
+select.styled-select option {
+  color: #111111;
+}
+
+/* ========================= */
+/* Semantic Value Coloring   */
+/* ========================= */
+
+.value-positive {
+  color: #22c55e; /* green */
+  font-weight: 600;
+}
+
+.value-negative {
+  color: #ef4444; /* red */
+  font-weight: 600;
+}
+
+.value-neutral {
+  color: #e5e7eb;
+}
+
+.value-warning {
+  color: #f59e0b; /* amber */
+  font-weight: 600;
+}
+
+.chat-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+
+.estimate-btn-inline {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 600;
+  background: linear-gradient(135deg, #4da3ff, #6dd5fa);
+  color: #0b0f14;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.estimate-btn-inline:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(77, 163, 255, 0.35);
+}
+
+.lender-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.lender-card {
+  background: #121212;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.lender-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grade-A { color: #4ade80; }
+.grade-B { color: #facc15; }
+.grade-C { color: #f87171; }
+
+.lender-summary {
+  color: #b5b5b5;
+  margin: 0.5rem 0 1rem;
+}
+
+.lender-terms ul {
+  padding-left: 1rem;
+}
+
+.lender-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.deal-value select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, #9ca3af 50%),
+    linear-gradient(135deg, #9ca3af 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) center,
+    calc(100% - 9px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+/* ========================= */
+/* Deal Form – Final Layout  */
+/* ========================= */
+
+.deal-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;               /* ⬅️ IMPORTANT */
+}
+
+/* Row layout */
+
+/* Label */
+.deal-row label {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* Layout-only wrapper (NO visuals) */
+
+
+/* SINGLE visible pill */
+
+/* Dropdown arrow */
+.deal-value select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, #9ca3af 50%),
+    linear-gradient(135deg, #9ca3af 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) center,
+    calc(100% - 9px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+/* FINAL OVERRIDE — deal form pills */
+.deal-form .deal-value input,
+.deal-form .deal-value select {
+  height: 32px !important;
+  padding: 0 14px !important;
+  line-height: 32px !important;
+}
+
+
+
+.deal-value {
+  width: 200px;
+}
+
+
+.deal-row label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+.deal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+}
+
+.deal-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;              /* 🔥 critical */
+  gap: 10px;
+}
+
+.deal-value select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #9ca3af 50%),
+    linear-gradient(135deg, #9ca3af 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) center,
+    calc(100% - 9px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+.deal-row-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  height: 40px;
+  padding: 0 14px;
+
+  background: #161616;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+}
+
+.deal-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+.deal-row-pill input,
+.deal-row-pill select {
+  background: transparent;
+  border: none;
+  outline: none;
+
+  color: #e5e7eb;
+  font-size: 0.85rem;
+  text-align: right;
+  min-width: 120px;
+}
+/* ========================= */
+/* AUTH MODE (LOGIN PAGE)    */
+/* ========================= */
+
+.chat-shell.auth {
+  grid-template-columns: 260px 1fr; /* Sidebar + Main */
+}
+
+
+
+.message-bubble {
+  padding: 10px 14px;
+  border-radius: 14px;
+  max-width: 70%;
+  line-height: 1.4;
+  font-size: 0.9rem;
+}
+
+/* USER */
+.message-user {
+  background: var(--chat-user-bg);
+  color: var(--chat-user-text);
+  align-self: flex-end;
+}
+
+/* AI */
+.message-ai {
+  position: relative;
+  align-self: flex-start;
+
+  background: #161616;
+  border: 1px solid rgba(96, 165, 250, 0.35);
+
+  /* Soft FlipBot glow */
+  box-shadow:
+    0 0 0 1px rgba(96, 165, 250, 0.18),
+    0 0 20px rgba(56, 189, 248, 0.14);
+
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+
+/* Space between lender pill rows */
+.lender-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* 👈 THIS fixes the crowding */
+}
+
+.lender-card .estimate-btn-inline {
+  margin-top: 12px;
+}
+
+/* Separate CTA from pill stack */
+.lender-cta {
+  margin-top: 18px;
+  padding-top: 6px;
+  display: flex;
+}
+/* User label */
+.chat-sender-user {
+  font-weight: 600;
+  color: #9ca3af;
+}
+
+/* Flip (neutral) */
+.chat-sender-flip {
+  font-weight: 700;
+  color: #e5e7eb; /* normal text */
+}
+
+.chat-sender-bot {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+
+  background: linear-gradient(135deg, #60a5fa, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  text-shadow:
+    0 0 6px rgba(56, 189, 248, 0.45),
+    0 0 14px rgba(56, 189, 248, 0.25);
+}
+
+/* ===============================
+   🤖 FlipBot Thinking Animation
+   =============================== */
+
+.thinking-bubble {
+  opacity: 0.85;
+}
+
+.typing-indicator {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: #3b82f6; /* blue glow */
+  border-radius: 50%;
+  animation: typingBounce 1.4s infinite ease-in-out both;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+/* stagger animation */
+.typing-indicator span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.typing-indicator span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0s;
+}
+
+@keyframes typingBounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.stress-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+}
+
+.stress-table th,
+.stress-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  font-size: 0.85rem;
+}
+
+.stress-table th {
+  color: #9ca3af;
+  font-weight: 600;
+  text-align: left;
+}
+
+.verdict.strong-deal {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.verdict.borderline-deal {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.verdict.weak-deal {
+  color: #ef4444;
+  font-weight: 600;
+}
+

@@ -1,0 +1,16 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Environment variables (DO NOT COMMIT)
+.env
+*.env
+backend/*.env
+backend/key.env
+backend/backend.env
+chat-frontend/*.env
+chat-frontend/process.env
+
+# OS files
+.DS_Store
+Thumbs.db

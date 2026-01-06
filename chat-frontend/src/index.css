@@ -1,0 +1,29 @@
+/* Global font reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Force Jakarta Sans everywhere */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Make form controls inherit font */
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+

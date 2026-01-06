@@ -1,0 +1,9 @@
+.value-positive {
+  color: #22c55e; /* green */
+  font-weight: 600;
+}
+
+.value-negative {
+  color: #ef4444; /* red */
+  font-weight: 600;
+}

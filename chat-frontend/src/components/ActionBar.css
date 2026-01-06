@@ -1,0 +1,97 @@
+/* ===============================
+   ACTION BAR (SINGLE ROW)
+   =============================== */
+
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  padding: 0.6rem 0.75rem;
+
+  background: rgba(14, 14, 18, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.action-bar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===============================
+   BASE BUTTON
+   =============================== */
+
+.action-btn {
+  flex-shrink: 0;
+
+  height: 34px;
+  padding: 0 0.85rem;
+
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  color: #e5e7eb;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   PRIMARY ACTION
+   =============================== */
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  color: #fff;
+}
+
+.action-btn.primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+/* ===============================
+   DANGER / DOWNSIDE
+   =============================== */
+
+.action-btn.danger {
+  border-color: rgba(239, 68, 68, 0.6);
+  color: #f87171;
+}
+
+.action-btn.danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* ===============================
+   ACTIVE / RUNNING
+   =============================== */
+
+.action-btn.active {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: #3b82f6;
+  color: #93c5fd;
+}

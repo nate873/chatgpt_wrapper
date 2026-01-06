@@ -1,0 +1,62 @@
+.cash-to-close-card {
+  margin-top: 0.75rem;
+}
+
+.ctc-loan {
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  color: #555;
+}
+
+.ctc-section {
+  margin-bottom: 0.75rem;
+}
+
+.ctc-section h4 {
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.ctc-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  padding: 2px 0;
+}
+
+.ctc-subtotal {
+  border-top: 1px dashed #ddd;
+  margin-top: 4px;
+  padding-top: 4px;
+  font-weight: 600;
+}
+
+.ctc-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 2px solid #000;
+}
+
+.ctc-excludes {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.ctc-excludes ul {
+  padding-left: 1rem;
+  margin: 0.25rem 0 0;
+}
+.value-positive {
+  color: #22c55e; /* green */
+  font-weight: 600;
+}
+
+.value-negative {
+  color: #ef4444; /* red */
+  font-weight: 600;
+}
