@@ -52,7 +52,7 @@ const ChatPage = () => {
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login");
   const [activeAction, setActiveAction] = useState(null);
-  const API_BASE = "https://chatgptwrapper-production.up.railway.app";
+  const API_BASE = import.meta.env.VITE_API_BASE;
 const runAction = async (action, overrideDeal = null) => {
   if (credits !== null && credits <= 0) {
     navigate("/pricing-plans");
