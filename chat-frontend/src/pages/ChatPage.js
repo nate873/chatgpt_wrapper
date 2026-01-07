@@ -52,8 +52,8 @@ const ChatPage = () => {
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login");
   const [activeAction, setActiveAction] = useState(null);
-  const API_BASE = import.meta.env.VITE_API_BASE;
-const runAction = async (action, overrideDeal = null) => {
+  const API_BASE = process.env.REACT_APP_API_BASE;
+  const runAction = async (action, overrideDeal = null) => {
   if (credits !== null && credits <= 0) {
     navigate("/pricing-plans");
     return;
@@ -78,8 +78,8 @@ const runAction = async (action, overrideDeal = null) => {
 
   try {
    const res = await fetch(
-  "https://chatgptwrapper-production.up.railway.app/api/chat",
-  {
+  `${API_BASE}/api/chat`,
+   {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

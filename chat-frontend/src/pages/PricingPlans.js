@@ -4,7 +4,7 @@ import "./PricingPlans.css";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import { supabase } from "../supabaseClient";
-const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = process.env.REACT_APP_API_BASE;
 const PricingPlans = () => {
   const [user, setUser] = useState(null);
   const [plan, setPlan] = useState("free");
