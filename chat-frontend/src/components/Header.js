@@ -6,13 +6,16 @@ import { useNavigate } from "react-router-dom";
 
 const Header = ({ user, plan, credits }) => {
   const [open, setOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogoClick = () => {
     if (user?.id) {
-      navigate("/chat"); // logged in → app
+      navigate("/chat");
     } else {
-      navigate("/"); // logged out → landing
+      navigate("/");
     }
   };
 
@@ -35,10 +38,95 @@ const Header = ({ user, plan, credits }) => {
         </div>
 
         <nav className="header-nav">
-          <button className="nav-item">Contact Us</button>
-          <button className="nav-item">Affiliate Program</button>
-          <button className="nav-item">Notifications</button>
-          <button className="nav-item">Tools</button>
+          <button className="nav-item" onClick={() => navigate("/about")}>
+            About
+          </button>
+
+          <button
+            className="nav-item"
+            onClick={() => navigate("/affiliate-program")}
+          >
+            Affiliate Program
+          </button>
+
+          {/* 🔔 Notifications (icon + toggle) */}
+          <div className="notifications-wrapper">
+            <button
+  className="nav-item"
+  onClick={() => {
+    setNotificationsOpen(prev => !prev);
+    setToolsOpen(false);
+  }}
+>
+  Notifications
+</button>
+
+            {notificationsOpen && (
+              <div className="notifications-dropdown clean">
+                <span className="notif-label">Notifications</span>
+
+                <label className="notif-toggle">
+                  <input
+                    type="checkbox"
+                    checked={notificationsEnabled}
+                    onChange={() =>
+                      setNotificationsEnabled(prev => !prev)
+                    }
+                  />
+                  <span className="slider" />
+                </label>
+              </div>
+            )}
+          </div>
+
+          {/* 🧰 Tools */}
+          <div className="tools-wrapper">
+            <button
+              className="nav-item"
+              onClick={() => {
+                setToolsOpen(prev => !prev);
+                setNotificationsOpen(false);
+              }}
+            >
+              Tools
+            </button>
+
+            {toolsOpen && (
+              <div className="tools-dropdown">
+                <div className="tools-grid">
+                  <div className="tool-item">
+                    <span className="tool-icon">💬</span>
+                    <span>Deal Chat</span>
+                  </div>
+
+                  <div className="tool-item">
+                    <span className="tool-icon">🏘️</span>
+                    <span>Off-Market Properties</span>
+                  </div>
+
+                  <div className="tool-item">
+                    <span className="tool-icon">🏦</span>
+                    <span>Saved Lenders</span>
+                  </div>
+
+                  <div className="tool-item">
+                    <span className="tool-icon">⭐</span>
+                    <span>Saved Deals</span>
+                  </div>
+
+                  <div className="tool-item">
+                    <span className="tool-icon">📊</span>
+                    <span>DSCR Analysis</span>
+                  </div>
+
+                  <div className="tool-item">
+                    <span className="tool-icon">⚠️</span>
+                    <span>Stress Test</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </nav>
       </div>
 
@@ -70,12 +158,10 @@ const Header = ({ user, plan, credits }) => {
                   Plan: <strong>{plan ?? "free"}</strong>
                 </span>
                 <span>
-                  ⚡ Credits remaining:{" "}
-                  <strong>{credits ?? 0}</strong>
+                  ⚡ Credits remaining: <strong>{credits ?? 0}</strong>
                 </span>
               </div>
 
-              {/* Only show trial button if FREE */}
               {plan === "free" && (
                 <button
                   className="dropdown-btn primary"
@@ -88,10 +174,7 @@ const Header = ({ user, plan, credits }) => {
                 </button>
               )}
 
-              <button
-                className="dropdown-btn"
-                onClick={handleLogout}
-              >
+              <button className="dropdown-btn" onClick={handleLogout}>
                 Log out
               </button>
             </div>

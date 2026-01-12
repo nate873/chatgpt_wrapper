@@ -13,6 +13,8 @@ import ContactPage from "./pages/ContactPage";
 import LandingPage from "./pages/LandingPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PricingPlans from "./pages/PricingPlans";
+import About from "./pages/About";
+import AffiliateProgram from "./pages/AffiliateProgram"; // ✅ ADD THIS
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/pricing-plans" element={<PricingPlans />} />
       <Route path="/contact" element={<ContactPage />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/affiliate-program" element={<AffiliateProgram />} /> {/* ✅ NEW */}
 
       {/* 🔒 PROTECTED ROUTES */}
       <Route

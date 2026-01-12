@@ -1,0 +1,75 @@
+.about-page {
+  padding: 60px 20px;
+  background: linear-gradient(180deg, #0b0b0f, #050507);
+  color: #eaeaea;
+}
+
+.about-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.about-title {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.accent {
+  color: #4ea1ff;
+}
+
+.about-subtitle {
+  font-size: 18px;
+  color: #b0b0b0;
+  margin-bottom: 40px;
+}
+
+.about-section {
+  margin-bottom: 36px;
+}
+
+.about-section h2 {
+  font-size: 22px;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.about-section p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #d0d0d0;
+}
+
+.about-list {
+  padding-left: 20px;
+}
+
+.about-list li {
+  margin-bottom: 8px;
+  color: #d0d0d0;
+}
+.about-page {
+  margin-left: 260px; /* EXACT width of your sidebar */
+}
+/* Themed links for About page */
+.about-page a {
+  color: #60a5fa; /* theme blue */
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.about-page a:hover {
+  color: #93c5fd;
+  text-shadow: 0 0 6px rgba(96, 165, 250, 0.6);
+}
+
+.flip {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.about-container {
+  margin-left: 120px;
+}

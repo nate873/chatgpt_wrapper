@@ -29,7 +29,7 @@ const Sidebar = ({
         </button>
 
         <button className="sidebar-item" disabled={!loggedIn}>
-          Wholesale Inventory
+          Off Market Properties
         </button>
 
         <button className="sidebar-item" disabled={!loggedIn}>
