@@ -106,4 +106,8 @@ def create_portal_session(data: PortalRequest):
     except Exception as e:
      import traceback
     traceback.print_exc()
-    raise
+    raise HTTPException(
+        status_code=500,
+        detail=str(e) or "Stripe billing portal failed"
+    )
+
