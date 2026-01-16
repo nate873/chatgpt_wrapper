@@ -9,6 +9,7 @@ const AppLayout = () => {
   const [user, setUser] = useState(null);
   const [plan, setPlan] = useState("free");
   const [credits, setCredits] = useState(null);
+  const [stripeCustomerId, setStripeCustomerId] = useState(null);
 
   // Load auth user
   useEffect(() => {
@@ -17,19 +18,25 @@ const AppLayout = () => {
     });
   }, []);
 
-  // Load profile data
+  // Load profile data (SOURCE OF TRUTH)
   useEffect(() => {
     if (!user?.id) return;
 
     supabase
       .from("profiles")
-      .select("plan, credits_remaining")
+      .select("plan, credits_remaining, stripe_customer_id")
       .eq("id", user.id)
       .single()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Profile load error:", error);
+          return;
+        }
+
         if (data) {
           setPlan(data.plan);
           setCredits(data.credits_remaining);
+          setStripeCustomerId(data.stripe_customer_id);
         }
       });
   }, [user]);
@@ -48,7 +55,14 @@ const AppLayout = () => {
         />
 
         <main className="app-main">
-          <Outlet context={{ user, plan, credits }} />
+          <Outlet
+            context={{
+              user,
+              plan,
+              credits,
+              stripeCustomerId, // ✅ restored
+            }}
+          />
         </main>
       </div>
     </>
