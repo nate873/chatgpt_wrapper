@@ -95,7 +95,7 @@ def create_portal_session(data: PortalRequest):
         raise HTTPException(status_code=400, detail="Missing customer_id")
 
     try:
-        session = stripe.billing_portal.sessions.create(
+        session = stripe.billing_portal.Session.create(
             customer=data.customer_id,
             return_url=f"{FRONTEND_URL}/pricing-plans",
         )
