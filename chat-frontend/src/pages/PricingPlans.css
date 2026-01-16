@@ -2,10 +2,7 @@
    PAGE LAYOUT
 ========================= */
 
-.pricing-page {
-  width: 100%;
-  padding: 3rem 1.5rem 4rem;
-}
+
 
 .pricing-title {
   text-align: center;
@@ -203,23 +200,46 @@
    PRICING PAGE FIXES
 ========================= */
 
-.chat-shell {
-  height: auto !important;
-  min-height: 100vh;
-}
+/* =========================
+   PRICING PAGE LAYOUT FIX
+========================= */
 
-.chat-panel {
-  height: auto !important;
-  max-height: none !important;
-  overflow-y: auto !important;
-}
-
+/* Wrap the pricing page content */
 .pricing-page {
-  min-height: calc(100vh - 120px);
-  padding-bottom: 4rem;
+  padding-left: 260px; /* match sidebar width */
+  padding-right: 2rem;
+  padding-top: 3rem;
+  box-sizing: border-box;
 }
 
-/* Ensure cards never clip */
+/* Ensure grid never touches edges */
+.pricing-grid {
+  width: 100%;
+  max-width: 1150px;
+  margin: 0 auto;
+}
+
+/* Prevent card clipping */
 .pricing-card {
-  overflow: visible;
+  min-width: 0;
+}
+
+/* =========================
+   RESPONSIVE SIDEBAR FIX
+========================= */
+
+@media (max-width: 1024px) {
+  .pricing-page {
+    padding-left: 0;
+  }
+
+  .pricing-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .pricing-page {
+    padding: 1.5rem 1rem;
+  }
 }

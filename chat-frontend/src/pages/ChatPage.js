@@ -1,16 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./ChatPage.css";
 import DealAnalysisCard from "../components/DealAnalysisCard";
-import Header from "../components/Header";
 import LenderInsightCard from "../components/LenderInsightCard";
 import LenderResultsGrid from "../components/LenderResultsGrid";
 import DSCRAnalysisCard from "../components/DSCRAnalysisCard";
-import { supabase } from "../supabaseClient";
 import { US_STATES } from "../usStates";
 import { citiesByState} from "../citiesbyState_100";
 import StressTestCard from "../components/StressTestCard";
 import AuthModal from "../components/AuthModal";
-import Sidebar from "../components/Sidebar";
 import CashToCloseCard from "../components/CashToCloseCard";
 import HoldSensitivityCard from "../components/HoldSensitivityCard";
 import APRDefaultRiskCard from "../components/APRDefaultRiskCard";
@@ -18,6 +15,7 @@ import WorstCaseCard from "../components/WorstCaseCard";
 import CityOpportunityCard from "../components/CityOpportunityCard";
 import ActionBar from "../components/ActionBar";
 import { useNavigate } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 
 
 const initialMessages = [
@@ -38,21 +36,35 @@ function formatCurrency(value) {
 
 const ChatPage = () => {
     const navigate = useNavigate();
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState(() => {
+  try {
+    const saved = localStorage.getItem("flipbot_messages");
+    return saved ? JSON.parse(saved) : initialMessages;
+  } catch {
+    return initialMessages;
+  }
+});
+  const { user, credits, } = useOutletContext();
   const [isThinking, setIsThinking] = useState(false);
   const [freeformInput, setFreeformInput] = useState("");
   const [showDealPanel, setShowDealPanel] = useState(false);
-  const [lastAnalyzedDeal, setLastAnalyzedDeal] = useState(null);
+const [lastAnalyzedDeal, setLastAnalyzedDeal] = useState(() => {
+  try {
+    const saved = localStorage.getItem("flipbot_last_deal");
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+});
+
   const [uiMode, setUIMode] = useState("CHAT");
   const [lenderInsight] = useState(null);  
   const [pendingField, setPendingField] = useState(null);
-  const [user, setUser] = useState(null);
-  const [credits, setCredits] = useState(null);
-  const [plan, setPlan] = useState("free");
   const [authOpen, setAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState("login");
+  const [authMode] = useState("login");
   const [activeAction, setActiveAction] = useState(null);
   const API_BASE = process.env.REACT_APP_API_BASE;
+  
   const runAction = async (action, overrideDeal = null) => {
   if (credits !== null && credits <= 0) {
     navigate("/pricing-plans");
@@ -168,34 +180,24 @@ const formatNumber = (value) => {
 const unformatNumber = (value) =>
   value.replace(/,/g, "");
 
+useEffect(() => {
+  if (lastAnalyzedDeal) {
+    localStorage.setItem(
+      "flipbot_last_deal",
+      JSON.stringify(lastAnalyzedDeal)
+    );
+  }
+}, [lastAnalyzedDeal]);
+
+useEffect(() => {
+  localStorage.setItem("flipbot_messages", JSON.stringify(messages));
+}, [messages]);
 
 useEffect(() => {
   scrollToBottom();
 }, [messages, isThinking]);
 
-useEffect(() => {
-  supabase.auth.getUser().then(({ data }) => {
-    setUser(data?.user ?? null);
-  });
-}, []);
-useEffect(() => {
-  if (!user?.id) return;
 
-  const loadProfile = async () => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("credits_remaining, plan")
-      .eq("id", user.id)
-      .single();
-
-    if (!error && data) {
-      setCredits(data.credits_remaining);
-      setPlan(data.plan); // 🔥 THIS WAS MISSING
-    }
-  };
-
-  loadProfile();
-}, [user]);
 
 
 
@@ -906,27 +908,11 @@ setMessages(prev => [
   
  return (
   <div className="chat-page">
-<Header user={user} plan={plan} credits={credits} />
 
     <div className={`chat-shell ${showDealPanel ? "show-deal" : ""}`}>
 
       {/* APP SIDEBAR (NEW) */}
-   <Sidebar
-  loggedIn={!!user}
-  onLoginClick={() => {
-    setAuthMode("login");
-    setAuthOpen(true);
-  }}
-  onRegisterClick={() => {
-    setAuthMode("register");
-    setAuthOpen(true);
-  }}
-  onLogoutClick={async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-  }}
-/>
-
+   
 
       {/* DEAL ANALYZER */}
       <aside className="deal-panel">
@@ -1239,6 +1225,9 @@ setMessages(prev => [
   setShowDealPanel(true);
   setIntakeDeal({});
   setIntakeActive(false);
+
+localStorage.removeItem("flipbot_messages");
+localStorage.removeItem("flipbot_last_deal");
 }}
 
   onRunAction={(action) => {

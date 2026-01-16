@@ -14,40 +14,40 @@ import LandingPage from "./pages/LandingPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PricingPlans from "./pages/PricingPlans";
 import About from "./pages/About";
-import AffiliateProgram from "./pages/AffiliateProgram"; // ✅ ADD THIS
+import AffiliateProgram from "./pages/AffiliateProgram";
+
+// ✅ NEW
+import AppLayout from "./layouts/AppLayout";
 
 function App() {
   return (
     <Routes>
-      {/* PUBLIC ROUTES */}
+      {/* PUBLIC — NO LAYOUT */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/privacy" element={<PrivacyPolicyPage />} />
-      <Route path="/terms" element={<TermsPage />} />
-      <Route path="/pricing-plans" element={<PricingPlans />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/affiliate-program" element={<AffiliateProgram />} /> {/* ✅ NEW */}
 
-      {/* 🔒 PROTECTED ROUTES */}
+      {/* PUBLIC — WITH APP LAYOUT */}
+      <Route element={<AppLayout />}>
+        <Route path="/about" element={<About />} />
+        <Route path="/affiliate-program" element={<AffiliateProgram />} />
+        <Route path="/pricing-plans" element={<PricingPlans />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+      </Route>
+
+      {/* 🔒 PROTECTED — STILL PROTECTED */}
       <Route
-        path="/chat"
         element={
           <ProtectedRoute>
-            <ChatPage />
+            <AppLayout />
           </ProtectedRoute>
         }
-      />
-
-      <Route
-        path="/subscription"
-        element={
-          <ProtectedRoute>
-            <SubscriptionPage />
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/subscription" element={<SubscriptionPage />} />
+      </Route>
 
       {/* FALLBACK */}
       <Route path="*" element={<NotFoundPage />} />

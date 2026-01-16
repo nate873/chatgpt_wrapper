@@ -1,29 +1,19 @@
 import React from "react";
-import Header from "../components/Header";
+import "./About.css"; // ✅ reuse About styling
 
 const TermsPage = () => {
   return (
-    <div className="chat-page">
-      <Header />
-
-      <div
-        style={{
-          maxWidth: "900px",
-          margin: "0 auto",
-          padding: "3rem 1.5rem",
-          color: "#e5e7eb",
-          lineHeight: "1.7",
-        }}
-      >
-        <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>
-          Terms of Service
+    <main className="about-page">
+      <div className="about-container">
+        <h1 className="about-title">
+          Terms <span className="accent">of Service</span>
         </h1>
 
-        <p style={{ opacity: 0.8, marginBottom: "2rem" }}>
+        <p className="about-subtitle">
           Last updated: January 2026
         </p>
 
-        <section>
+        <section className="about-section">
           <p>
             Welcome to <strong>FlipBot</strong>. By accessing or using our
             website, application, and services (the “Service”), you agree to be
@@ -35,89 +25,107 @@ const TermsPage = () => {
           </p>
         </section>
 
-        <h2>1. Description of Service</h2>
-        <p>
-          FlipBot provides AI-powered real estate deal analysis, research tools,
-          and financial insights. All results are provided for informational
-          purposes only and do not constitute financial, legal, or investment
-          advice.
-        </p>
+        <section className="about-section">
+          <h2>1. Description of Service</h2>
+          <p>
+            FlipBot provides AI-powered real estate deal analysis, research tools,
+            and financial insights. All outputs are provided for informational
+            purposes only and do not constitute financial, legal, or investment
+            advice.
+          </p>
+        </section>
 
-        <h2>2. Eligibility</h2>
-        <p>
-          You must be at least 18 years old to use the Service. By using the
-          Service, you represent and warrant that you meet this requirement.
-        </p>
+        <section className="about-section">
+          <h2>2. Eligibility</h2>
+          <p>
+            You must be at least 18 years old to use the Service. By using the
+            Service, you represent and warrant that you meet this requirement.
+          </p>
+        </section>
 
-        <h2>3. Accounts</h2>
-        <p>
-          You are responsible for maintaining the confidentiality of your
-          account credentials and for all activity that occurs under your
-          account. We reserve the right to suspend or terminate accounts that
-          violate these Terms.
-        </p>
+        <section className="about-section">
+          <h2>3. Accounts</h2>
+          <p>
+            You are responsible for maintaining the confidentiality of your
+            account credentials and for all activity that occurs under your
+            account. We reserve the right to suspend or terminate accounts that
+            violate these Terms.
+          </p>
+        </section>
 
-        <h2>4. Subscriptions & Credits</h2>
-        <ul>
-          <li>FlipBot offers Free, Pro, and Premium subscription plans</li>
-          <li>Paid plans are billed on a recurring monthly basis</li>
-          <li>Credits reset each billing cycle and do not roll over</li>
-          <li>Credits have no cash value and are non-transferable</li>
-        </ul>
+        <section className="about-section">
+          <h2>4. Subscriptions & Credits</h2>
+          <ul className="about-list">
+            <li>FlipBot offers Free, Pro, and Premium plans</li>
+            <li>Paid plans are billed on a recurring monthly basis</li>
+            <li>Credits reset each billing cycle and do not roll over</li>
+            <li>Credits have no cash value and are non-transferable</li>
+          </ul>
+        </section>
 
-        <h2>5. Payments & Billing</h2>
-        <p>
-          Payments are processed securely through Stripe. By purchasing a
-          subscription, you authorize recurring charges until cancellation.
-          Refunds are not provided for partial billing periods or unused
-          credits.
-        </p>
+        <section className="about-section">
+          <h2>5. Payments & Billing</h2>
+          <p>
+            Payments are processed securely through Stripe. By purchasing a
+            subscription, you authorize recurring charges until cancellation.
+            Refunds are not provided for partial billing periods or unused
+            credits.
+          </p>
+        </section>
 
-        <h2>6. Acceptable Use</h2>
-        <p>You agree not to:</p>
-        <ul>
-          <li>Use the Service for unlawful purposes</li>
-          <li>Attempt to bypass usage limits or safeguards</li>
-          <li>Reverse-engineer or misuse AI systems</li>
-          <li>Resell or share access to the Service</li>
-        </ul>
+        <section className="about-section">
+          <h2>6. Acceptable Use</h2>
+          <ul className="about-list">
+            <li>Use the Service for unlawful purposes</li>
+            <li>Attempt to bypass usage limits or safeguards</li>
+            <li>Reverse-engineer or misuse AI systems</li>
+            <li>Resell or share access to the Service</li>
+          </ul>
+        </section>
 
-        <h2>7. Disclaimer</h2>
-        <p>
-          All outputs generated by FlipBot are estimates only. Real estate
-          investing involves risk, and you assume full responsibility for any
-          decisions made using the Service.
-        </p>
+        <section className="about-section">
+          <h2>7. Disclaimer</h2>
+          <p>
+            All outputs generated by FlipBot are estimates only. Real estate
+            investing involves risk, and you assume full responsibility for any
+            decisions made using the Service.
+          </p>
+        </section>
 
-        <h2>8. Limitation of Liability</h2>
-        <p>
-          To the maximum extent permitted by law, FlipBot shall not be liable
-          for any indirect, incidental, or consequential damages arising from
-          your use of the Service.
-        </p>
+        <section className="about-section">
+          <h2>8. Limitation of Liability</h2>
+          <p>
+            To the maximum extent permitted by law, FlipBot shall not be liable
+            for any indirect, incidental, or consequential damages arising from
+            your use of the Service.
+          </p>
+        </section>
 
-        <h2>9. Termination</h2>
-        <p>
-          We may suspend or terminate access to the Service at any time for
-          violations of these Terms or misuse of the platform.
-        </p>
+        <section className="about-section">
+          <h2>9. Termination</h2>
+          <p>
+            We may suspend or terminate access to the Service at any time for
+            violations of these Terms or misuse of the platform.
+          </p>
+        </section>
 
-        <h2>10. Changes to Terms</h2>
-        <p>
-          We may update these Terms from time to time. Continued use of the
-          Service after changes constitutes acceptance of the updated Terms.
-        </p>
+        <section className="about-section">
+          <h2>10. Changes to Terms</h2>
+          <p>
+            We may update these Terms periodically. Continued use of the Service
+            after changes constitutes acceptance of the updated Terms.
+          </p>
+        </section>
 
-        <h2>11. Contact</h2>
-        <p>
-          If you have any questions about these Terms, please contact us at:
-        </p>
-
-        <p>
-          <strong>nate@actionfunding.net</strong>
-        </p>
+        <section className="about-section">
+          <h2>11. Contact</h2>
+          <p>
+            Questions about these Terms? Contact{" "}
+            <strong>nate@actionfunding.net</strong>
+          </p>
+        </section>
       </div>
-    </div>
+    </main>
   );
 };
 
