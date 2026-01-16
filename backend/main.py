@@ -16,8 +16,15 @@ from datetime import date, datetime
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 
-supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+def get_supabase():
+    if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="Supabase is not configured"
+        )
+    return create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
+supabase = get_supabase()
 HARD_MONEY_PROGRAMS = {
     "fix_and_flip",
     "ground_up",
@@ -75,12 +82,14 @@ app.include_router(stripe_router)
 from webhooks import router as webhook_router
 app.include_router(webhook_router)
 
+
 def require_and_charge_credit(
     user_id: str,
     action_type: str,
     reference_id: Optional[str] = None,
     credits: int = 1,
 ):
+    
     # Load profile
     prof = (
         supabase.table("profiles")
