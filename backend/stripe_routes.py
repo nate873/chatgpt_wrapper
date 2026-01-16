@@ -9,7 +9,7 @@ router = APIRouter(prefix="/stripe", tags=["stripe"])
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 
-SUPABASE_URL = os.getenv("SUPABASE_URI")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
