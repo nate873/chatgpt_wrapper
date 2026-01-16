@@ -104,8 +104,6 @@ def create_portal_session(data: PortalRequest):
         return {"url": session.url}
 
     except Exception as e:
-        print("❌ Stripe portal error:", str(e))
-        raise HTTPException(
-            status_code=500,
-            detail="Unable to open billing portal"
-        )
+     import traceback
+    traceback.print_exc()
+    raise
