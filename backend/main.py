@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv("backend.env")
 from typing import Optional, Dict, Any
 import random
 import json
