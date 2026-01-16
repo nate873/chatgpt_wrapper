@@ -96,18 +96,18 @@ def create_portal_session(data: PortalRequest):
 
     try:
         session = stripe.billing_portal.sessions.create(
-    customer=data.customer_id,
-    return_url=f"{FRONTEND_URL}/pricing-plans",
-)
-
+            customer=data.customer_id,
+            return_url=f"{FRONTEND_URL}/pricing-plans",
+        )
 
         return {"url": session.url}
 
-    except Exception as e:
-     import traceback
-    traceback.print_exc()
-    raise HTTPException(
-        status_code=500,
-        detail=str(e) or "Stripe billing portal failed"
-    )
+    except Exception as err:
+        import traceback
+        traceback.print_exc()
 
+        # IMPORTANT: never re-raise, never reference err outside this block
+        raise HTTPException(
+            status_code=500,
+            detail="Stripe billing portal error (see server logs)"
+        )
