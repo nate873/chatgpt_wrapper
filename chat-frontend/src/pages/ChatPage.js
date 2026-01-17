@@ -16,6 +16,7 @@ import CityOpportunityCard from "../components/CityOpportunityCard";
 import ActionBar from "../components/ActionBar";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 
 const initialMessages = [
@@ -36,15 +37,11 @@ function formatCurrency(value) {
 
 const ChatPage = () => {
     const navigate = useNavigate();
-  const [messages, setMessages] = useState(() => {
-  try {
-    const saved = localStorage.getItem("flipbot_messages");
-    return saved ? JSON.parse(saved) : initialMessages;
-  } catch {
-    return initialMessages;
-  }
-});
+  const [messages, setMessages] = useState(initialMessages);
+
   const { user, credits, } = useOutletContext();
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get("session");
   const [isThinking, setIsThinking] = useState(false);
   const [freeformInput, setFreeformInput] = useState("");
   const [showDealPanel, setShowDealPanel] = useState(false);
@@ -197,6 +194,57 @@ useEffect(() => {
   scrollToBottom();
 }, [messages, isThinking]);
 
+useEffect(() => {
+  if (!sessionId || !user?.id) return;
+
+  const loadSession = async () => {
+    try {
+      setIsThinking(true);
+
+      const res = await fetch(
+        `${API_BASE}/api/deal-sessions/${sessionId}/messages`
+      );
+
+      const data = await res.json();
+
+      // Convert DB messages → UI messages
+      const restoredMessages = data.messages.map((m) => {
+        if (m.sender === "assistant" && typeof m.content === "object") {
+          return {
+            id: m.id,
+            sender: "ai",
+            data: m.content, // DealAnalysisCard, StressTest, etc.
+          };
+        }
+
+        return {
+          id: m.id,
+          sender: m.sender === "user" ? "user" : "ai",
+          text:
+            typeof m.content === "string"
+              ? m.content
+              : JSON.stringify(m.content),
+        };
+      });
+
+      setMessages(restoredMessages);
+
+      // Restore deal context for follow-up actions
+      if (data.deal) {
+        setLastAnalyzedDeal({
+          ...data.deal,
+          userId: user.id,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to load deal session", err);
+    } finally {
+      setIsThinking(false);
+    }
+  };
+
+  loadSession();
+}, [sessionId, user?.id, API_BASE]);
 
 
 
