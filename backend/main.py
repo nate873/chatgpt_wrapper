@@ -25,6 +25,29 @@ def get_supabase():
     return create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
 supabase = get_supabase()
+
+def create_deal_session(user_id: str, deal: Dict[str, Any]) -> str:
+    title = (
+        deal.get("address")
+        or f"${deal.get('purchasePrice', '')} Deal"
+        or "New Deal"
+    )
+
+    res = (
+        supabase.table("deal_sessions")
+        .insert({
+            "user_id": user_id,
+            "title": title,
+            "deal_type": deal.get("transactionType"),
+            "address": deal.get("address"),
+            "purchase_price": deal.get("purchasePrice"),
+        })
+        .execute()
+    )
+
+    return res.data[0]["id"]
+    
+  
 HARD_MONEY_PROGRAMS = {
     "fix_and_flip",
     "ground_up",
@@ -36,6 +59,20 @@ class ChatRequest(BaseModel):
     message: Optional[str] = None      # chat question OR legacy deal text
     deal: Optional[Dict[str, Any]] = None  # preferred for deal mode
 app = FastAPI()
+
+@app.get("/api/deal-sessions")
+def list_deal_sessions(user_id: str):
+    res = (
+        supabase.table("deal_sessions")
+        .select("id, title, created_at")
+        .eq("user_id", user_id)
+        .eq("archived", False)
+        .order("created_at", desc=True)
+        .execute()
+    )
+
+    return res.data or []
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -81,6 +118,13 @@ app.include_router(stripe_router)
 
 from webhooks import router as webhook_router
 app.include_router(webhook_router)
+
+def save_message(session_id: str, sender: str, content: Dict[str, Any]):
+    supabase.table("deal_messages").insert({
+        "session_id": session_id,
+        "sender": sender,   # "user" or "assistant"
+        "content": content, # JSON
+    }).execute()
 
 
 def require_and_charge_credit(
@@ -890,16 +934,33 @@ def chat_endpoint(data: ChatRequest):
             if not user_id:
                 raise HTTPException(401, "Unauthorized")
 
+            # 🔥 CREATE A NEW DEAL SESSION
+            session_id = create_deal_session(user_id, deal)
+            
+            save_message(
+            session_id=session_id,
+             sender="user",
+             content=deal
+                   )
             require_and_charge_credit(
                 user_id=user_id,
                 action_type="deal_analysis",
+                reference_id=session_id,
                 credits=1
             )
 
+            analysis = compute_deal_response(deal)
+            save_message(
+        session_id=session_id,
+        sender="assistant",
+        content=analysis
+    )
             return {
+                "sessionId": session_id,
                 "uiMode": "CARD_DEAL",
-                "response": compute_deal_response(deal),
+                "response": analysis,
             }
+
 
         # ==================================================
         # 💬 CHAT MODE (FREE)
@@ -913,6 +974,21 @@ def chat_endpoint(data: ChatRequest):
     except Exception as e:
         print("🔥 BACKEND ERROR:", e)
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/deal-sessions/{session_id}/messages")
+def get_deal_messages(session_id: str):
+    res = (
+        supabase.table("deal_messages")
+        .select("id, sender, content, created_at")
+        .eq("session_id", session_id)
+        .order("created_at", desc=False)
+        .execute()
+    )
+
+    return {
+        "sessionId": session_id,
+        "messages": res.data or []
+    }
 
 
 
