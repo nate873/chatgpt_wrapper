@@ -30,6 +30,12 @@ def get_supabase():
 supabase = get_supabase()
 
 def create_deal_session(user_id: str, deal: Dict[str, Any]) -> str:
+    # 🔧 Normalize transaction type
+    transaction_type = (deal.get("transactionType") or "purchase").strip().lower()
+
+    if transaction_type not in ("purchase", "refinance"):
+        transaction_type = "purchase"
+
     title = (
         deal.get("address")
         or f"${deal.get('purchasePrice', '')} Deal"
@@ -41,14 +47,19 @@ def create_deal_session(user_id: str, deal: Dict[str, Any]) -> str:
         .insert({
             "user_id": user_id,
             "title": title,
-            "deal_type": deal.get("transactionType"),
+            "deal_type": transaction_type,
             "address": deal.get("address"),
             "purchase_price": deal.get("purchasePrice"),
         })
         .execute()
     )
 
+    if not res.data:
+        raise HTTPException(500, "Failed to create deal session")
+
     return res.data[0]["id"]
+
+    
     
   
 HARD_MONEY_PROGRAMS = {
