@@ -12,15 +12,18 @@ const Sidebar = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [showSavedDeals, setShowSavedDeals] = useState(false);
+  const API_BASE = process.env.REACT_APP_API_BASE;
+
   const [dealSessions, setDealSessions] = useState([]);
   const [loadingDeals, setLoadingDeals] = useState(false);
 
-  const API_BASE = process.env.REACT_APP_API_BASE;
+  // Active deal from URL (?session=...)
+  const activeSessionId =
+    new URLSearchParams(location.search).get("session");
 
-  // Fetch saved deals
+  // Fetch saved deals (chat-history style)
   useEffect(() => {
-    if (!loggedIn || !userId || !showSavedDeals) return;
+    if (!loggedIn || !userId) return;
 
     const fetchDeals = async () => {
       setLoadingDeals(true);
@@ -38,16 +41,12 @@ const Sidebar = ({
     };
 
     fetchDeals();
-  }, [loggedIn, userId, showSavedDeals, API_BASE]);
-
-  const openDeal = (sessionId) => {
-    navigate(`/chat?session=${sessionId}`);
-  };
+  }, [loggedIn, userId, API_BASE]);
 
   return (
     <aside className="app-sidebar">
       <nav className="sidebar-nav">
-        {/* MAIN CHAT */}
+        {/* MAIN NAV */}
         <button
           className={`sidebar-item ${
             location.pathname === "/chat" ? "active" : ""
@@ -70,42 +69,35 @@ const Sidebar = ({
           Settings
         </button>
 
-        {/* SAVED DEALS (CHATGPT-STYLE HISTORY) */}
-        <button
-          className="sidebar-item sidebar-expandable"
-          disabled={!loggedIn}
-          onClick={() => setShowSavedDeals((v) => !v)}
-        >
-          Saved Deals
-          <span className={`chevron ${showSavedDeals ? "open" : ""}`}>▾</span>
-        </button>
+        {/* SAVED DEALS (CHAT HISTORY STYLE) */}
+        <div className="sidebar-section">
+          <div className="sidebar-section-title">Saved Deals</div>
 
-        {showSavedDeals && (
-          <div className="sidebar-sublist">
-            {loadingDeals && (
-              <div className="sidebar-subitem muted">Loading…</div>
-            )}
+          {loadingDeals && (
+            <div className="sidebar-subitem muted">Loading…</div>
+          )}
 
-            {!loadingDeals && dealSessions.length === 0 && (
-              <div className="sidebar-subitem muted">
-                No saved deals yet
+          {!loadingDeals && dealSessions.length === 0 && (
+            <div className="sidebar-subitem muted">
+              No saved deals yet
+            </div>
+          )}
+
+          {dealSessions.map((deal) => (
+            <button
+              key={deal.id}
+              className={`sidebar-subitem deal-history-item ${
+                activeSessionId === deal.id ? "active" : ""
+              }`}
+              onClick={() => navigate(`/chat?session=${deal.id}`)}
+            >
+              <div className="deal-title">{deal.title}</div>
+              <div className="deal-date">
+                {new Date(deal.created_at).toLocaleDateString()}
               </div>
-            )}
-
-            {dealSessions.map((deal) => (
-              <button
-                key={deal.id}
-                className="sidebar-subitem"
-                onClick={() => openDeal(deal.id)}
-              >
-                <div className="deal-title">{deal.title}</div>
-                <div className="deal-date">
-                  {new Date(deal.created_at).toLocaleDateString()}
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
+            </button>
+          ))}
+        </div>
       </nav>
 
       <div className="sidebar-spacer" />
