@@ -429,9 +429,10 @@ pushDealCard(
   data.response,
   {
     ...deal,
-    ...data.response,
+    userId: user?.id,   // 👈 THIS IS THE FIX
   }
 );
+
 
     } catch {
       setMessages((prev) => [
