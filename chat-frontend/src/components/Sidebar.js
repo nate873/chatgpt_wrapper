@@ -23,25 +23,35 @@ const Sidebar = ({
 
   // Fetch saved deals (chat-history style)
   useEffect(() => {
-    if (!loggedIn || !userId) return;
+  if (!loggedIn || !userId) return;
 
-    const fetchDeals = async () => {
-      setLoadingDeals(true);
-      try {
-        const res = await fetch(
-          `${API_BASE}/api/deal-sessions?user_id=${userId}`
-        );
-        const data = await res.json();
-        setDealSessions(data || []);
-      } catch (err) {
-        console.error("Failed to load deal sessions", err);
-      } finally {
-        setLoadingDeals(false);
-      }
-    };
+  const fetchDeals = async () => {
+    setLoadingDeals(true);
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/deal-sessions?user_id=${userId}`
+      );
+      const data = await res.json();
+      setDealSessions(data || []);
+    } catch (err) {
+      console.error("Failed to load deal sessions", err);
+    } finally {
+      setLoadingDeals(false);
+    }
+  };
 
-    fetchDeals();
-  }, [loggedIn, userId, API_BASE]);
+  // initial load
+  fetchDeals();
+
+  // 🔥 listen for new deal creation
+  const onDealCreated = () => fetchDeals();
+  window.addEventListener("deal-created", onDealCreated);
+
+  return () => {
+    window.removeEventListener("deal-created", onDealCreated);
+  };
+}, [loggedIn, userId, API_BASE]);
+
 
   return (
     <aside className="app-sidebar">
