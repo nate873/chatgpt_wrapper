@@ -48,6 +48,7 @@ const AppLayout = () => {
       <div className="app-shell">
         <Sidebar
           loggedIn={!!user}
+            userId={user?.id}     
           onLogoutClick={async () => {
             await supabase.auth.signOut();
             setUser(null);
