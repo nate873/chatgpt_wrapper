@@ -16,6 +16,9 @@ from datetime import date, datetime
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 
+def json_safe(obj):
+    return json.loads(json.dumps(obj, default=str))
+
 def get_supabase():
     if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
         raise HTTPException(
@@ -938,10 +941,11 @@ def chat_endpoint(data: ChatRequest):
             session_id = create_deal_session(user_id, deal)
             
             save_message(
-            session_id=session_id,
-             sender="user",
-             content=deal
-                   )
+    session_id=session_id,
+    sender="user",
+    content=json_safe(deal)
+)
+
             require_and_charge_credit(
                 user_id=user_id,
                 action_type="deal_analysis",
@@ -951,10 +955,11 @@ def chat_endpoint(data: ChatRequest):
 
             analysis = compute_deal_response(deal)
             save_message(
-        session_id=session_id,
-        sender="assistant",
-        content=analysis
-    )
+    session_id=session_id,
+    sender="assistant",
+    content=json_safe(analysis)
+)
+
             return {
                 "sessionId": session_id,
                 "uiMode": "CARD_DEAL",
