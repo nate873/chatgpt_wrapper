@@ -33,34 +33,62 @@ def create_deal_session(user_id: str, deal: Dict[str, Any]) -> str:
     # 🔧 Normalize transaction type
     transaction_type = (deal.get("transactionType") or "purchase").strip().lower()
 
-    if transaction_type not in ("purchase", "refinance"):
+    if transaction_type not in ("purchase", "refinance", "cash_out_refi"):
         transaction_type = "purchase"
 
-    title = (
-        deal.get("address")
-        or f"${deal.get('purchasePrice', '')} Deal"
-        or "New Deal"
-    )
+    # ---------- TITLE BUILDING ----------
+    city = (deal.get("city") or "").strip()
 
+    # Human-friendly transaction label
+    if transaction_type in ("refinance", "cash_out_refi"):
+        transaction_label = "Refi"
+    else:
+        transaction_label = "Purchase"
+
+    # Pick correct amount
+    if transaction_label == "Purchase":
+        amount = deal.get("purchasePrice")
+    else:
+        amount = deal.get("existingLoanBalance") or deal.get("purchasePrice")
+
+    amount_label = f"${int(amount):,}" if amount else ""
+
+    # Build clean title (no empty separators)
+    title_parts = []
+    if city:
+        title_parts.append(city)
+
+    title_parts.append(transaction_label)
+
+    if amount_label:
+        title_parts.append(amount_label)
+
+    title = " · ".join(title_parts)
+
+    # Fallback safety (should rarely hit)
+    if not title:
+        title = "New Deal"
+
+    # ---------- INSERT ----------
     res = (
         supabase.table("deal_sessions")
         .insert({
             "user_id": user_id,
             "title": title,
             "deal_type": transaction_type,
+            "city": city,
             "address": deal.get("address"),
             "purchase_price": deal.get("purchasePrice"),
+            "archived": False,
         })
         .execute()
     )
 
     if not res.data:
-        raise HTTPException(500, "Failed to create deal session")
+        raise HTTPException(status_code=500, detail="Failed to create deal session")
 
     return res.data[0]["id"]
 
-    
-    
   
 HARD_MONEY_PROGRAMS = {
     "fix_and_flip",
