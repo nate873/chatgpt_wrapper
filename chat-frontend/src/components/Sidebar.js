@@ -21,37 +21,35 @@ const Sidebar = ({
   const activeSessionId =
     new URLSearchParams(location.search).get("session");
 
-  // Fetch saved deals (chat-history style)
+  // Fetch saved deals
   useEffect(() => {
-  if (!loggedIn || !userId) return;
+    if (!loggedIn || !userId) return;
 
-  const fetchDeals = async () => {
-    setLoadingDeals(true);
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/deal-sessions?user_id=${userId}`
-      );
-      const data = await res.json();
-      setDealSessions(data || []);
-    } catch (err) {
-      console.error("Failed to load deal sessions", err);
-    } finally {
-      setLoadingDeals(false);
-    }
-  };
+    const fetchDeals = async () => {
+      setLoadingDeals(true);
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/deal-sessions?user_id=${userId}`
+        );
+        const data = await res.json();
+        setDealSessions(data || []);
+      } catch (err) {
+        console.error("Failed to load deal sessions", err);
+      } finally {
+        setLoadingDeals(false);
+      }
+    };
 
-  // initial load
-  fetchDeals();
+    fetchDeals();
 
-  // 🔥 listen for new deal creation
-  const onDealCreated = () => fetchDeals();
-  window.addEventListener("deal-created", onDealCreated);
+    // 🔥 listen for new deal creation
+    const onDealCreated = () => fetchDeals();
+    window.addEventListener("deal-created", onDealCreated);
 
-  return () => {
-    window.removeEventListener("deal-created", onDealCreated);
-  };
-}, [loggedIn, userId, API_BASE]);
-
+    return () => {
+      window.removeEventListener("deal-created", onDealCreated);
+    };
+  }, [loggedIn, userId, API_BASE]);
 
   return (
     <aside className="app-sidebar">
@@ -79,34 +77,36 @@ const Sidebar = ({
           Settings
         </button>
 
-        {/* SAVED DEALS (CHAT HISTORY STYLE) */}
+        {/* SAVED DEALS */}
         <div className="sidebar-section">
           <div className="sidebar-section-title">Saved Deals</div>
 
-          {loadingDeals && (
-            <div className="sidebar-subitem muted">Loading…</div>
-          )}
+          <div className="sidebar-deals-scroll">
+            {loadingDeals && (
+              <div className="sidebar-subitem muted">Loading…</div>
+            )}
 
-          {!loadingDeals && dealSessions.length === 0 && (
-            <div className="sidebar-subitem muted">
-              No saved deals yet
-            </div>
-          )}
-
-          {dealSessions.map((deal) => (
-            <button
-              key={deal.id}
-              className={`sidebar-subitem deal-history-item ${
-                activeSessionId === deal.id ? "active" : ""
-              }`}
-              onClick={() => navigate(`/chat?session=${deal.id}`)}
-            >
-              <div className="deal-title">{deal.title}</div>
-              <div className="deal-date">
-                {new Date(deal.created_at).toLocaleDateString()}
+            {!loadingDeals && dealSessions.length === 0 && (
+              <div className="sidebar-subitem muted">
+                No saved deals yet
               </div>
-            </button>
-          ))}
+            )}
+
+            {dealSessions.map((deal) => (
+              <button
+                key={deal.id}
+                className={`sidebar-subitem deal-history-item ${
+                  activeSessionId === deal.id ? "active" : ""
+                }`}
+                onClick={() => navigate(`/chat?session=${deal.id}`)}
+              >
+                <div className="deal-title">{deal.title}</div>
+                <div className="deal-date">
+                  {new Date(deal.created_at).toLocaleDateString()}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </nav>
 
