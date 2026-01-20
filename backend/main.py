@@ -1211,11 +1211,23 @@ def intake_endpoint(data: ChatRequest):
     
 
     # ✅ RUN ANALYSIS
-    return {
-        "complete": True,
-        "uiMode": "CARD_DEAL",
-        "response": compute_deal_response(deal),
-    }
+    # ✅ INTAKE COMPLETE → CREATE DEAL SESSION
+        session_id = create_deal_session(user_id, deal)
+
+        analysis = compute_deal_response(deal)
+
+        save_message(
+    session_id=session_id,
+    sender="assistant",
+    content=json_safe(analysis),
+        )
+
+        return {
+    "complete": True,
+    "sessionId": session_id,
+    "uiMode": "CARD_DEAL",
+    "response": analysis,
+          }
 
 
 # =========================
