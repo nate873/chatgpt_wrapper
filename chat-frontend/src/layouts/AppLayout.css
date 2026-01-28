@@ -1,0 +1,11 @@
+.app-shell {
+display: flex;
+height: calc(100vh - 64px); /* header height */
+}
+
+
+.app-main {
+flex: 1;
+background: #0f0f0f; /* ← THIS controls the blue */
+
+}

@@ -9,9 +9,9 @@
 
 /* Page container */
 .offmarket-shell {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0; /* app-main already pads */
+max-width: 1100px;
+margin: 0 auto;
+transform: translateX(180px);
 }
 
 /* =========================
@@ -43,6 +43,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 22px;
+  color:#111111
 }
 
 /* =========================
@@ -156,4 +157,10 @@
   text-align: center;
   color: #9ca3af;
   padding: 3rem 0;
+}
+
+.OffMarketProperties-Page {
+  padding: 60px 20px;
+  background: linear-gradient(180deg, #0b0b0f, #050507);
+  color: #eaeaea;
 }

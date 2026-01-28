@@ -41,8 +41,6 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsPage />} />
-
-        {/* ✅ OFF MARKET PROPERTIES */}
         <Route path="/off-market" element={<OffMarketProperties />} />
       </Route>
 
