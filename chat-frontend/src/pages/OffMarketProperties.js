@@ -39,62 +39,68 @@ const OffMarketProperties = () => {
 
   return (
     <div className="offmarket-content">
-      {/* INTRO */}
-      <section className="offmarket-intro">
-        <h1>Off-Market Properties</h1>
-        <p>
-          Curated off-market real estate opportunities from verified providers.
-          Analyze deals instantly with AI-powered underwriting.
-        </p>
-      </section>
-
-      {/* LISTINGS */}
-      <section className="offmarket-grid">
-        {loading && <p className="loading">Loading listings…</p>}
-
-        {!loading && listings.length === 0 && (
-          <p className="empty">
-            No off-market properties available yet.
+      <div className="offmarket-shell">
+        {/* INTRO */}
+        <section className="offmarket-intro">
+          <h1>Off-Market Properties</h1>
+          <p>
+            Curated off-market real estate opportunities from verified providers.
+            Analyze deals instantly with AI-powered underwriting.
           </p>
-        )}
+        </section>
 
-        {listings.map((listing) => (
-          <div key={listing.id} className="offmarket-card">
-            <div className="card-header">
-              <h3>{listing.title}</h3>
-              <span className="badge">{listing.property_type}</span>
-            </div>
+        {/* LISTINGS */}
+        <section className="offmarket-grid">
+          {loading && <p className="loading">Loading listings…</p>}
 
-            <div className="card-location">
-              {listing.city}, {listing.state}
-            </div>
-
-            <div className="card-metrics">
-              {listing.price && (
-                <div>
-                  <span>Price</span>
-                  <strong>${Number(listing.price).toLocaleString()}</strong>
-                </div>
-              )}
-
-              {listing.arv && (
-                <div>
-                  <span>ARV</span>
-                  <strong>${Number(listing.arv).toLocaleString()}</strong>
-                </div>
-              )}
-            </div>
-
-            <p className="card-description">
-              {listing.description?.slice(0, 120)}…
+          {!loading && listings.length === 0 && (
+            <p className="empty">
+              No off-market properties available yet.
             </p>
+          )}
 
-            <button className="analyze-btn">
-              Analyze Deal →
-            </button>
-          </div>
-        ))}
-      </section>
+          {listings.map((listing) => (
+            <div key={listing.id} className="offmarket-card">
+              <div className="card-header">
+                <h3>{listing.title}</h3>
+                <span className="badge">{listing.property_type}</span>
+              </div>
+
+              <div className="card-location">
+                {listing.city}, {listing.state}
+              </div>
+
+              <div className="card-metrics">
+                {listing.price && (
+                  <div>
+                    <span>Price</span>
+                    <strong>
+                      ${Number(listing.price).toLocaleString()}
+                    </strong>
+                  </div>
+                )}
+
+                {listing.arv && (
+                  <div>
+                    <span>ARV</span>
+                    <strong>
+                      ${Number(listing.arv).toLocaleString()}
+                    </strong>
+                  </div>
+                )}
+              </div>
+
+              <p className="card-description">
+                {listing.description?.slice(0, 120)}…
+              </p>
+
+              <button className="analyze-btn">
+                Analyze Deal →
+              </button>
+            </div>
+          ))}
+        </section>
+      </div>
     </div>
   );
 };

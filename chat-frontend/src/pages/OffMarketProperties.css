@@ -1,12 +1,38 @@
 /* ===============================
-   OFF MARKET PAGE
+   OFF MARKET PAGE (CHAT-STYLE)
    =============================== */
 
+/* OUTER CANVAS — matches chat-page behavior */
 .offmarket-content {
+  height: 100vh;
+  width: 100%;
+  background: #0f0f0f;
   color: #e5e7eb;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  box-sizing: border-box;
 }
 
-/* INTRO */
+/* INNER SHELL — this is the “fake magic” */
+.offmarket-shell {
+  width: 100%;
+  max-width: 1200px;
+
+  padding: 2.75rem 2.5rem 3.5rem;
+
+  background: radial-gradient(circle at top, #0b1220, #020617);
+  border-radius: 20px;
+
+  box-sizing: border-box;
+}
+
+/* =========================
+   INTRO
+   ========================= */
+
 .offmarket-intro {
   margin-bottom: 3rem;
 }
@@ -24,14 +50,20 @@
   line-height: 1.6;
 }
 
-/* GRID */
+/* =========================
+   GRID
+   ========================= */
+
 .offmarket-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
 }
 
-/* CARD */
+/* =========================
+   CARD
+   ========================= */
+
 .offmarket-card {
   background: linear-gradient(
     180deg,
@@ -41,8 +73,10 @@
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 16px;
   padding: 18px 18px 20px;
+
   display: flex;
   flex-direction: column;
+
   transition: all 0.25s ease;
 }
 
@@ -52,7 +86,10 @@
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
 }
 
-/* HEADER */
+/* =========================
+   HEADER
+   ========================= */
+
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -73,20 +110,28 @@
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 999px;
+
   background: rgba(59, 130, 246, 0.15);
   color: #60a5fa;
   border: 1px solid rgba(59, 130, 246, 0.35);
+
   white-space: nowrap;
 }
 
-/* LOCATION */
+/* =========================
+   LOCATION
+   ========================= */
+
 .card-location {
   font-size: 0.8rem;
   color: #94a3b8;
   margin-bottom: 14px;
 }
 
-/* METRICS */
+/* =========================
+   METRICS
+   ========================= */
+
 .card-metrics {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -114,7 +159,10 @@
   color: #f9fafb;
 }
 
-/* DESCRIPTION */
+/* =========================
+   DESCRIPTION
+   ========================= */
+
 .card-description {
   font-size: 0.85rem;
   color: #cbd5f5;
@@ -123,17 +171,23 @@
   flex-grow: 1;
 }
 
-/* BUTTON */
+/* =========================
+   BUTTON
+   ========================= */
+
 .analyze-btn {
   margin-top: auto;
   border: none;
   border-radius: 12px;
   padding: 10px 14px;
+
   background: linear-gradient(135deg, #3b82f6, #6366f1);
   color: #ffffff;
+
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
+
   transition: all 0.2s ease;
 }
 
@@ -142,7 +196,10 @@
   box-shadow: 0 18px 48px rgba(59, 130, 246, 0.45);
 }
 
-/* STATES */
+/* =========================
+   STATES
+   ========================= */
+
 .loading,
 .empty {
   grid-column: 1 / -1;
