@@ -19,14 +19,13 @@
 /* INNER SHELL — this is the “fake magic” */
 .offmarket-shell {
   width: 100%;
-  max-width: 1200px;
+  max-width: 980px;          /* 👈 matches chat feel */
+  padding: 2.5rem 2.25rem;
 
-  padding: 2.75rem 2.5rem 3.5rem;
+  margin-top: 1.5rem;        /* lifts it like chat */
 
   background: radial-gradient(circle at top, #0b1220, #020617);
   border-radius: 20px;
-
-  box-sizing: border-box;
 }
 
 /* =========================
