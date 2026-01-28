@@ -2,32 +2,38 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-import LoginPage from "./pages/LoginPage";
-import ChatPage from "./pages/ChatPage";
-import RegisterPage from "./pages/RegisterPage";
-import SubscriptionPage from "./pages/SubscriptionPage";
-import NotFoundPage from "./pages/NotFoundPage";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
-import TermsPage from "./pages/TermsPage";
-import ContactPage from "./pages/ContactPage";
+// PUBLIC PAGES
 import LandingPage from "./pages/LandingPage";
-import ProtectedRoute from "./components/ProtectedRoute";
-import PricingPlans from "./pages/PricingPlans";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import About from "./pages/About";
 import AffiliateProgram from "./pages/AffiliateProgram";
+import PricingPlans from "./pages/PricingPlans";
+import ContactPage from "./pages/ContactPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import TermsPage from "./pages/TermsPage";
 
-// ✅ NEW
+// APP PAGES
+import ChatPage from "./pages/ChatPage";
+import SubscriptionPage from "./pages/SubscriptionPage";
+import OffMarketProperties from "./pages/OffMarketProperties";
+
+// LAYOUT + PROTECTION
 import AppLayout from "./layouts/AppLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+// FALLBACK
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
     <Routes>
-      {/* PUBLIC — NO LAYOUT */}
+      {/* ================= PUBLIC (NO LAYOUT) ================= */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* PUBLIC — WITH APP LAYOUT */}
+      {/* ================= PUBLIC (WITH APP LAYOUT) ================= */}
       <Route element={<AppLayout />}>
         <Route path="/about" element={<About />} />
         <Route path="/affiliate-program" element={<AffiliateProgram />} />
@@ -35,9 +41,12 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsPage />} />
+
+        {/* ✅ OFF MARKET PROPERTIES */}
+        <Route path="/off-market" element={<OffMarketProperties />} />
       </Route>
 
-      {/* 🔒 PROTECTED — STILL PROTECTED */}
+      {/* ================= PROTECTED (AUTH REQUIRED) ================= */}
       <Route
         element={
           <ProtectedRoute>
@@ -49,7 +58,7 @@ function App() {
         <Route path="/subscription" element={<SubscriptionPage />} />
       </Route>
 
-      {/* FALLBACK */}
+      {/* ================= FALLBACK ================= */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
