@@ -69,9 +69,14 @@ const Sidebar = ({
           My Lenders
         </button>
 
-        <button className="sidebar-item" disabled={!loggedIn}>
-          Off Market Properties
-        </button>
+        <button
+  className={`sidebar-item ${
+    location.pathname === "/off-market" ? "active" : ""
+  }`}
+  disabled={!loggedIn}
+onClick={() => navigate("/off-market")}>
+  Off Market Properties
+</button>
 
         <button className="sidebar-item" disabled={!loggedIn}>
           Settings
