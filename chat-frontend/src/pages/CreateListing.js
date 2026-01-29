@@ -22,6 +22,7 @@ const CreateListing = () => {
     description: ""
   });
 
+  /* ================= LOAD USER + PROFILE ================= */
   useEffect(() => {
     const loadUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -29,13 +30,13 @@ const CreateListing = () => {
 
       setUser(user);
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("is_provider, provider_approved")
         .eq("id", user.id)
         .single();
 
-      setProfile(data);
+      if (!error) setProfile(data);
     };
 
     loadUser();
@@ -49,7 +50,7 @@ const CreateListing = () => {
     );
   }
 
-  /* ✅ ONLY REQUIRE is_provider — NOT approval */
+  /* ================= PROVIDER GATE ================= */
   if (!profile.is_provider) {
     return (
       <div className="provider-dashboard">
@@ -59,25 +60,42 @@ const CreateListing = () => {
     );
   }
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  /* ================= FORM HANDLER ================= */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   /* ================= SAVE DRAFT ================= */
   const saveDraft = async () => {
+    const payload = {
+      provider_id: user.id,
+      deal_status: "draft",
+      is_published: false,
+
+      title: form.title || null,
+      property_type: form.property_type || null,
+      street: form.street || null,
+      city: form.city || null,
+      state: form.state || null,
+      description: form.description || null,
+
+      price: form.price ? Number(form.price) : null,
+      arv: form.arv ? Number(form.arv) : null,
+      beds: form.beds ? Number(form.beds) : null,
+      baths: form.baths ? Number(form.baths) : null,
+      sqft: form.sqft ? Number(form.sqft) : null
+    };
+
     const { data, error } = await supabase
       .from("off_market_listings")
-      .insert({
-        provider_id: user.id,
-        ...form,
-        deal_status: "draft",
-        is_published: false
-      })
+      .insert(payload)
       .select()
       .single();
 
     if (error) {
-      console.error(error);
-      alert("Error saving listing");
+      console.error("INSERT ERROR:", error);
+      alert(error.message);
       return;
     }
 
@@ -100,6 +118,7 @@ const CreateListing = () => {
 
     if (uploadError) {
       console.error(uploadError);
+      alert("Photo upload failed");
       return;
     }
 
@@ -135,13 +154,27 @@ const CreateListing = () => {
 
       <div className="provider-form">
         <input name="title" placeholder="Title" onChange={handleChange} />
-        <input name="property_type" placeholder="Property Type" onChange={handleChange} />
+        <input
+          name="property_type"
+          placeholder="Property Type"
+          onChange={handleChange}
+        />
         <input name="street" placeholder="Street" onChange={handleChange} />
         <input name="city" placeholder="City" onChange={handleChange} />
         <input name="state" placeholder="State" onChange={handleChange} />
 
-        <input name="price" type="number" placeholder="Price" onChange={handleChange} />
-        <input name="arv" type="number" placeholder="ARV" onChange={handleChange} />
+        <input
+          name="price"
+          type="number"
+          placeholder="Price"
+          onChange={handleChange}
+        />
+        <input
+          name="arv"
+          type="number"
+          placeholder="ARV"
+          onChange={handleChange}
+        />
 
         <textarea
           name="description"
@@ -154,7 +187,7 @@ const CreateListing = () => {
         </button>
       </div>
 
-      {/* 📸 PHOTO UPLOAD */}
+      {/* ================= PHOTOS ================= */}
       {listingId && (
         <>
           <h3 style={{ marginTop: 32 }}>Photos</h3>
