@@ -2,7 +2,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-// PUBLIC PAGES
+// ================= PUBLIC PAGES =================
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -13,16 +13,24 @@ import ContactPage from "./pages/ContactPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsPage from "./pages/TermsPage";
 
-// APP PAGES
+// ================= APP PAGES =================
 import ChatPage from "./pages/ChatPage";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import OffMarketProperties from "./pages/OffMarketProperties";
 
-// LAYOUT + PROTECTION
+// ================= PROVIDER PAGES =================
+import ProviderDashboard from "./pages/ProviderDashboard";
+import CreateListing from "./pages/CreateListing";
+
+// ================= ADMIN PAGES =================
+import AdminProviders from "./pages/AdminProviders";
+
+// ================= LAYOUT + PROTECTION =================
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 
-// FALLBACK
+// ================= FALLBACK =================
 import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
@@ -54,6 +62,23 @@ function App() {
       >
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/subscription" element={<SubscriptionPage />} />
+
+        {/* ===== PROVIDER ROUTES ===== */}
+        <Route path="/provider" element={<ProviderDashboard />} />
+        <Route path="/provider/create" element={<CreateListing />} />
+      </Route>
+
+      {/* ================= ADMIN (ADMIN ONLY) ================= */}
+      <Route
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <AppLayout />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/admin/providers" element={<AdminProviders />} />
       </Route>
 
       {/* ================= FALLBACK ================= */}

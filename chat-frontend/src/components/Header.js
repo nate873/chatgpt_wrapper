@@ -25,6 +25,15 @@ const Header = ({ user, plan, credits }) => {
     navigate("/");
   };
 
+  // 🔑 NEW: List a Property handler
+  const handleListProperty = () => {
+    if (!user?.id) {
+      navigate("/login");
+    } else {
+      navigate("/provider");
+    }
+  };
+
   return (
     <header className="app-header">
       {/* LEFT */}
@@ -49,17 +58,17 @@ const Header = ({ user, plan, credits }) => {
             Affiliate Program
           </button>
 
-          {/* 🔔 Notifications (icon + toggle) */}
+          {/* 🔔 Notifications */}
           <div className="notifications-wrapper">
             <button
-  className="nav-item"
-  onClick={() => {
-    setNotificationsOpen(prev => !prev);
-    setToolsOpen(false);
-  }}
->
-  Notifications
-</button>
+              className="nav-item"
+              onClick={() => {
+                setNotificationsOpen((prev) => !prev);
+                setToolsOpen(false);
+              }}
+            >
+              Notifications
+            </button>
 
             {notificationsOpen && (
               <div className="notifications-dropdown clean">
@@ -70,7 +79,7 @@ const Header = ({ user, plan, credits }) => {
                     type="checkbox"
                     checked={notificationsEnabled}
                     onChange={() =>
-                      setNotificationsEnabled(prev => !prev)
+                      setNotificationsEnabled((prev) => !prev)
                     }
                   />
                   <span className="slider" />
@@ -84,7 +93,7 @@ const Header = ({ user, plan, credits }) => {
             <button
               className="nav-item"
               onClick={() => {
-                setToolsOpen(prev => !prev);
+                setToolsOpen((prev) => !prev);
                 setNotificationsOpen(false);
               }}
             >
@@ -127,6 +136,14 @@ const Header = ({ user, plan, credits }) => {
               </div>
             )}
           </div>
+
+          {/* ⭐ PRIMARY CTA */}
+          <button
+            className="nav-item primary"
+            onClick={handleListProperty}
+          >
+            List a Property
+          </button>
         </nav>
       </div>
 
@@ -142,7 +159,7 @@ const Header = ({ user, plan, credits }) => {
         <div className="account-menu">
           <button
             className="account-avatar"
-            onClick={() => setOpen(prev => !prev)}
+            onClick={() => setOpen((prev) => !prev)}
           >
             {user?.email?.[0]?.toUpperCase() || "U"}
           </button>
@@ -158,7 +175,8 @@ const Header = ({ user, plan, credits }) => {
                   Plan: <strong>{plan ?? "free"}</strong>
                 </span>
                 <span>
-                  ⚡ Credits remaining: <strong>{credits ?? 0}</strong>
+                  ⚡ Credits remaining:{" "}
+                  <strong>{credits ?? 0}</strong>
                 </span>
               </div>
 

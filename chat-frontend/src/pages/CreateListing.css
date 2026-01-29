@@ -1,0 +1,5 @@
+.provider-dashboard {
+  padding: 40px;
+  margin-left: 240px; /* 👈 MATCHES SIDEBAR WIDTH */
+  color: #e5e7eb;
+}
