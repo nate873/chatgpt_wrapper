@@ -1,5 +1,176 @@
+/* =========================================================
+   BASE LAYOUT
+   ========================================================= */
+
 .provider-dashboard {
-  padding: 40px;
-  margin-left: 240px; /* 👈 MATCHES SIDEBAR WIDTH */
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 24px;
   color: #e5e7eb;
+   margin-right: 120px;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.provider-dashboard .question-card,
+.provider-dashboard .review-card {
+  max-width: 760px;
+  margin-top: 40px;
+  padding: 0;
+}
+
+/* Headings */
+.provider-dashboard h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 18px;
+}
+
+.provider-dashboard h3 {
+  margin-top: 28px;
+  margin-bottom: 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.provider-dashboard .muted {
+  font-size: 0.95rem;
+  color: #9ca3af;
+  margin-bottom: 22px;
+}
+
+/* =========================================================
+   RADIO GRID (CARD STYLE)
+   ========================================================= */
+
+.provider-dashboard .radio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.provider-dashboard .radio-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(148,163,184,0.22);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.provider-dashboard .radio-card:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(148,163,184,0.35);
+}
+
+.provider-dashboard .radio-card input {
+  accent-color: #3b82f6;
+  transform: scale(1.15);
+}
+
+/* Selected state */
+.provider-dashboard .radio-card:has(input:checked) {
+  border-color: #3b82f6;
+  background: rgba(59,130,246,0.12);
+}
+
+/* =========================================================
+   INPUTS (NO WHITE BOXES)
+   ========================================================= */
+
+.provider-dashboard input,
+.provider-dashboard textarea {
+  width: 100%;
+  background: #0b0f14;
+  border: 1px solid rgba(148,163,184,0.22);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.provider-dashboard textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.provider-dashboard input::placeholder,
+.provider-dashboard textarea::placeholder {
+  color: #9ca3af;
+}
+
+.provider-dashboard input:focus,
+.provider-dashboard textarea:focus {
+  outline: none;
+  border-color: rgba(59,130,246,0.8);
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.35);
+}
+
+/* Grid for inputs */
+.provider-dashboard .input-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.provider-dashboard .question-actions {
+  margin-top: 36px;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+/* Reset buttons */
+.provider-dashboard button {
+  all: unset;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Primary CTA */
+.provider-dashboard .btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
+  padding: 14px 36px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 14px;
+  box-shadow: 0 18px 48px rgba(59,130,246,0.45);
+  transition: all 0.2s ease;
+}
+
+.provider-dashboard .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 22px 60px rgba(59,130,246,0.6);
+}
+
+.provider-dashboard .btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Secondary (Back) */
+.provider-dashboard .question-actions button:not(.btn-primary) {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #9ca3af;
+}
+
+.provider-dashboard .question-actions button:not(.btn-primary):hover {
+  color: #e5e7eb;
+  text-decoration: underline;
 }

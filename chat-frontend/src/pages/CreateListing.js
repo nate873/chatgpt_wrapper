@@ -1,70 +1,92 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
-import "./ProviderDashboard.css";
+import "./CreateListing.css";
+import "./About.css";
 
 const CreateListing = () => {
+  const [step, setStep] = useState(1);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [listingId, setListingId] = useState(null);
-  const [photos, setPhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
-    title: "",
-    property_type: "",
+    deal_type: "",
+    seller_motivation: "",
+
     street: "",
     city: "",
     state: "",
-    price: "",
-    arv: "",
+    zip: "",
+
+    property_type: "",
+    year_built: "",
+    floors: "",
+
     beds: "",
     baths: "",
     sqft: "",
-    description: ""
+
+    price: "",
+    arv: "",
+
+    description: "",
+
+    contact_phone: "",
+    contact_email: ""
   });
 
-  /* ================= LOAD USER + PROFILE ================= */
+  /* ================= AUTH ================= */
   useEffect(() => {
-    const loadUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+    const load = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        setLoading(false);
+        return;
+      }
 
-      setUser(user);
+      setUser(data.session.user);
 
-      const { data, error } = await supabase
+      const { data: profile } = await supabase
         .from("profiles")
-        .select("is_provider, provider_approved")
-        .eq("id", user.id)
+        .select("is_provider")
+        .eq("id", data.session.user.id)
         .single();
 
-      if (!error) setProfile(data);
+      setProfile(profile);
+      setLoading(false);
     };
 
-    loadUser();
+    load();
   }, []);
 
-  if (!profile) {
+  if (loading) {
     return (
-      <div className="provider-dashboard">
-        <p>Loading…</p>
-      </div>
+      <main className="about-page">
+        <div className="about-container provider-dashboard">
+          <p>Loading…</p>
+        </div>
+      </main>
     );
   }
 
-  /* ================= PROVIDER GATE ================= */
-  if (!profile.is_provider) {
+  if (!profile?.is_provider) {
     return (
-      <div className="provider-dashboard">
-        <h1>Provider Access Required</h1>
-        <p>You must apply as a provider before creating listings.</p>
-      </div>
+      <main className="about-page">
+        <div className="about-container provider-dashboard">
+          <h1 className="about-title">Provider access required</h1>
+          <p className="about-subtitle">
+            You must be approved as a provider to create listings.
+          </p>
+        </div>
+      </main>
     );
   }
 
-  /* ================= FORM HANDLER ================= */
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  const update = (key, value) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
 
   /* ================= SAVE DRAFT ================= */
   const saveDraft = async () => {
@@ -73,18 +95,15 @@ const CreateListing = () => {
       deal_status: "draft",
       is_published: false,
 
-      title: form.title || null,
-      property_type: form.property_type || null,
-      street: form.street || null,
-      city: form.city || null,
-      state: form.state || null,
-      description: form.description || null,
+      ...form,
 
-      price: form.price ? Number(form.price) : null,
-      arv: form.arv ? Number(form.arv) : null,
+      year_built: form.year_built ? Number(form.year_built) : null,
+      floors: form.floors ? Number(form.floors) : null,
       beds: form.beds ? Number(form.beds) : null,
       baths: form.baths ? Number(form.baths) : null,
-      sqft: form.sqft ? Number(form.sqft) : null
+      sqft: form.sqft ? Number(form.sqft) : null,
+      price: form.price ? Number(form.price) : null,
+      arv: form.arv ? Number(form.arv) : null
     };
 
     const { data, error } = await supabase
@@ -94,136 +113,215 @@ const CreateListing = () => {
       .single();
 
     if (error) {
-      console.error("INSERT ERROR:", error);
       alert(error.message);
       return;
     }
 
     setListingId(data.id);
-    alert("Draft saved — you can now upload photos");
+    setStep(8);
   };
 
   /* ================= PHOTO UPLOAD ================= */
-  const uploadPhoto = async (file) => {
-    if (!listingId) {
-      alert("Save the listing first");
-      return;
+  const handlePhotoUpload = async (e) => {
+    const files = e.target.files;
+    if (!files || !listingId) return;
+
+    setUploading(true);
+
+    for (const file of files) {
+      const ext = file.name.split(".").pop();
+      const fileName = `${crypto.randomUUID()}.${ext}`;
+      const filePath = `${listingId}/${fileName}`;
+
+      await supabase.storage
+        .from("listing-photos")
+        .upload(filePath, file);
     }
 
-    const filePath = `${listingId}/${Date.now()}-${file.name}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("listing-photos")
-      .upload(filePath, file);
-
-    if (uploadError) {
-      console.error(uploadError);
-      alert("Photo upload failed");
-      return;
-    }
-
-    const { data } = supabase.storage
-      .from("listing-photos")
-      .getPublicUrl(filePath);
-
-    const { error: dbError } = await supabase
-      .from("listing_photos")
-      .insert({
-        listing_id: listingId,
-        url: data.publicUrl
-      });
-
-    if (!dbError) {
-      setPhotos((prev) => [...prev, data.publicUrl]);
-    }
+    setUploading(false);
+    alert("Photos uploaded!");
   };
 
-  /* ================= RENDER ================= */
+  /* ================= SUBMIT FOR REVIEW ================= */
+  const submitForReview = async () => {
+    if (!listingId) return;
+
+    setSubmitting(true);
+
+    const { error } = await supabase
+      .from("off_market_listings")
+      .update({
+        deal_status: "pending_review",
+        is_published: true
+      })
+      .eq("id", listingId);
+
+    setSubmitting(false);
+
+    if (error) {
+      alert("Error submitting listing for review.");
+      return;
+    }
+
+    alert("Listing submitted for review 🎉");
+  };
+
   return (
-    <div className="provider-dashboard">
-      <div className="dashboard-header">
-        <h1>Create Listing</h1>
-      </div>
+    <main className="about-page">
+      <div className="about-container provider-dashboard">
 
-      {!profile.provider_approved && (
-        <div className="provider-notice">
-          Your account is unverified. Listings are allowed, but verified providers
-          receive higher visibility.
-        </div>
-      )}
-
-      <div className="provider-form">
-        <input name="title" placeholder="Title" onChange={handleChange} />
-        <input
-          name="property_type"
-          placeholder="Property Type"
-          onChange={handleChange}
-        />
-        <input name="street" placeholder="Street" onChange={handleChange} />
-        <input name="city" placeholder="City" onChange={handleChange} />
-        <input name="state" placeholder="State" onChange={handleChange} />
-
-        <input
-          name="price"
-          type="number"
-          placeholder="Price"
-          onChange={handleChange}
-        />
-        <input
-          name="arv"
-          type="number"
-          placeholder="ARV"
-          onChange={handleChange}
-        />
-
-        <textarea
-          name="description"
-          placeholder="Description"
-          onChange={handleChange}
-        />
-
-        <button className="btn-primary" onClick={saveDraft}>
-          Save Draft
-        </button>
-      </div>
-
-      {/* ================= PHOTOS ================= */}
-      {listingId && (
-        <>
-          <h3 style={{ marginTop: 32 }}>Photos</h3>
-
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={async (e) => {
-              const files = Array.from(e.target.files);
-              for (const file of files) {
-                await uploadPhoto(file);
-              }
-            }}
-          />
-
-          <div className="photo-grid">
-            {photos.map((url, idx) => (
-              <img
-                key={idx}
-                src={url}
-                alt="Listing"
-                style={{
-                  width: 140,
-                  height: 100,
-                  objectFit: "cover",
-                  borderRadius: 8,
-                  marginRight: 10,
-                  marginTop: 10
-                }}
-              />
-            ))}
+        {/* STEP 1 */}
+        {step === 1 && (
+          <div className="question-card">
+            <h2>Who are you in this deal?</h2>
+            <div className="radio-grid">
+              {["Wholesaler", "Property owner", "Licensed agent", "Representing the owner"].map((o) => (
+                <label key={o} className="radio-card">
+                  <input
+                    type="radio"
+                    checked={form.deal_type === o}
+                    onChange={() => update("deal_type", o)}
+                  />
+                  <span>{o}</span>
+                </label>
+              ))}
+            </div>
+            <div className="question-actions">
+              <button className="btn-primary" onClick={() => setStep(2)}>Continue</button>
+            </div>
           </div>
-        </>
-      )}
-    </div>
+        )}
+
+        {/* STEP 2 */}
+        {step === 2 && (
+          <div className="question-card">
+            <h2>How soon does the owner want to sell?</h2>
+            <div className="radio-grid">
+              {["ASAP (0–30 days)", "1–3 months", "3–6 months", "Just testing the market"].map((o) => (
+                <label key={o} className="radio-card">
+                  <input
+                    type="radio"
+                    checked={form.seller_motivation === o}
+                    onChange={() => update("seller_motivation", o)}
+                  />
+                  <span>{o}</span>
+                </label>
+              ))}
+            </div>
+            <div className="question-actions">
+              <button onClick={() => setStep(1)}>Back</button>
+              <button className="btn-primary" onClick={() => setStep(3)}>Continue</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3 – LOCATION */}
+        {step === 3 && (
+          <div className="review-card">
+            <h2>Property location</h2>
+            <div className="input-grid">
+              <input placeholder="Street" onChange={(e) => update("street", e.target.value)} />
+              <input placeholder="City" onChange={(e) => update("city", e.target.value)} />
+              <input placeholder="State" onChange={(e) => update("state", e.target.value)} />
+              <input placeholder="ZIP" onChange={(e) => update("zip", e.target.value)} />
+            </div>
+            <div className="question-actions">
+              <button onClick={() => setStep(2)}>Back</button>
+              <button className="btn-primary" onClick={() => setStep(4)}>Continue</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 4 – PROPERTY DETAILS */}
+        {step === 4 && (
+          <div className="review-card">
+            <h2>Property details</h2>
+            <div className="input-grid">
+              <input placeholder="Property type" onChange={(e) => update("property_type", e.target.value)} />
+              <input placeholder="Year built" onChange={(e) => update("year_built", e.target.value)} />
+              <input placeholder="Floors / Stories" onChange={(e) => update("floors", e.target.value)} />
+            </div>
+            <div className="question-actions">
+              <button onClick={() => setStep(3)}>Back</button>
+              <button className="btn-primary" onClick={() => setStep(5)}>Continue</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 5 – SIZE */}
+        {step === 5 && (
+          <div className="review-card">
+            <h2>Size & layout</h2>
+            <div className="input-grid">
+              <input placeholder="Bedrooms" onChange={(e) => update("beds", e.target.value)} />
+              <input placeholder="Bathrooms" onChange={(e) => update("baths", e.target.value)} />
+              <input placeholder="Square feet" onChange={(e) => update("sqft", e.target.value)} />
+            </div>
+            <div className="question-actions">
+              <button onClick={() => setStep(4)}>Back</button>
+              <button className="btn-primary" onClick={() => setStep(6)}>Continue</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 6 – DEAL NUMBERS */}
+        {step === 6 && (
+          <div className="review-card">
+            <h2>Deal numbers</h2>
+            <div className="input-grid">
+              <input placeholder="Asking price" onChange={(e) => update("price", e.target.value)} />
+              <input placeholder="Estimated ARV" onChange={(e) => update("arv", e.target.value)} />
+            </div>
+            <div className="question-actions">
+              <button onClick={() => setStep(5)}>Back</button>
+              <button className="btn-primary" onClick={() => setStep(7)}>Continue</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 7 – CONTACT */}
+        {step === 7 && (
+          <div className="review-card">
+            <h2>Contact information</h2>
+            <div className="input-grid">
+              <input placeholder="Phone number" onChange={(e) => update("contact_phone", e.target.value)} />
+              <input placeholder="Email address" onChange={(e) => update("contact_email", e.target.value)} />
+            </div>
+            <textarea
+              placeholder="Additional notes for buyers…"
+              onChange={(e) => update("description", e.target.value)}
+            />
+            <div className="question-actions">
+              <button onClick={() => setStep(6)}>Back</button>
+              <button className="btn-primary" onClick={saveDraft}>
+                Save listing
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 8 – PHOTOS + SUBMIT */}
+        {step === 8 && (
+          <div className="question-card">
+            <h2>Upload photos</h2>
+            <input type="file" multiple accept="image/*" onChange={handlePhotoUpload} />
+            {uploading && <p>Uploading photos…</p>}
+
+            <div className="question-actions">
+              <button onClick={() => setStep(7)}>Back</button>
+              <button
+                className="btn-primary"
+                disabled={submitting}
+                onClick={submitForReview}
+              >
+                {submitting ? "Submitting…" : "Submit for review"}
+              </button>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </main>
   );
 };
 
