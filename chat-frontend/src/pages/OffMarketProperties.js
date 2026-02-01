@@ -14,32 +14,48 @@ const OffMarketProperties = () => {
       const { data, error } = await supabase
         .from("off_market_listings")
         .select(`
-          id,
-          title,
-          street,
-          city,
-          state,
-          property_type,
-          price,
-          arv,
-          beds,
-          baths,
-          sqft,
-          description,
-          photos,
-          created_at
-        `)
+  id,
+  street,
+  city,
+  state,
+  property_type,
+  price,
+  beds,
+  baths,
+  sqft,
+  created_at
+`)
+
         .eq("is_published", true)
         .eq("deal_status", "active")
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error loading off-market listings:", error);
+        console.error(error);
         setListings([]);
-      } else {
-        setListings(data || []);
+        setLoading(false);
+        return;
       }
 
+      const listingsWithImages = await Promise.all(
+        (data || []).map(async (listing) => {
+          const { data: files } = await supabase.storage
+            .from("listing-photos")
+            .list(listing.id, { limit: 1 });
+
+          if (files && files.length > 0) {
+            const { data: image } = supabase.storage
+              .from("listing-photos")
+              .getPublicUrl(`${listing.id}/${files[0].name}`);
+
+            return { ...listing, imageUrl: image.publicUrl };
+          }
+
+          return listing;
+        })
+      );
+
+      setListings(listingsWithImages);
       setLoading(false);
     };
 
@@ -47,10 +63,8 @@ const OffMarketProperties = () => {
   }, []);
 
   return (
-    <div className="offmarket-content">
+    <div className="offmarket-page">
       <div className="offmarket-shell">
-
-        {/* ================= INTRO ================= */}
         <section className="offmarket-intro">
           <h1>Off-Market Properties</h1>
           <p>
@@ -59,27 +73,16 @@ const OffMarketProperties = () => {
           </p>
         </section>
 
-        {/* ================= LISTINGS ================= */}
         <section className="offmarket-grid">
-          {loading && (
-            <p className="loading">Loading listings…</p>
-          )}
-
+          {loading && <p className="loading">Loading listings…</p>}
           {!loading && listings.length === 0 && (
-            <p className="empty">
-              No off-market properties available yet.
-            </p>
+            <p className="empty">No off-market properties available yet.</p>
           )}
-
           {!loading &&
             listings.map((listing) => (
-              <ListingCard
-                key={listing.id}
-                listing={listing}
-              />
+              <ListingCard key={listing.id} listing={listing} />
             ))}
         </section>
-
       </div>
     </div>
   );

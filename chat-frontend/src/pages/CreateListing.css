@@ -174,3 +174,47 @@
   color: #e5e7eb;
   text-decoration: underline;
 }
+
+/* =========================================================
+   SELECT DROPDOWNS (MATCH INPUT STYLE)
+   ========================================================= */
+
+.provider-dashboard select {
+  width: 100%;
+  background: #0b0f14;
+  border: 1px solid rgba(148,163,184,0.22);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+  appearance: none;              /* remove native styling */
+  cursor: pointer;
+
+  /* custom dropdown arrow */
+  background-image:
+    linear-gradient(45deg, transparent 50%, #9ca3af 50%),
+    linear-gradient(135deg, #9ca3af 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% - 4px),
+    calc(100% - 13px) calc(50% - 4px);
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.provider-dashboard select:focus {
+  outline: none;
+  border-color: rgba(59,130,246,0.8);
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.35);
+}
+
+/* Disabled (city before state) */
+.provider-dashboard select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dropdown options (browser-limited but helps) */
+.provider-dashboard select option {
+  background: #0b0f14;
+  color: #e5e7eb;
+}

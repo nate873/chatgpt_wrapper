@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
+import { citiesByState } from "../citiesbyState_100";
 import "./CreateListing.css";
 import "./About.css";
 
@@ -11,32 +12,30 @@ const CreateListing = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedState, setSelectedState] = useState("");
 
   const [form, setForm] = useState({
     deal_type: "",
     seller_motivation: "",
-
     street: "",
     city: "",
     state: "",
     zip: "",
-
     property_type: "",
     year_built: "",
     floors: "",
-
     beds: "",
     baths: "",
     sqft: "",
-
     price: "",
     arv: "",
-
     description: "",
-
     contact_phone: "",
     contact_email: ""
   });
+
+  const update = (key, value) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
 
   /* ================= AUTH ================= */
   useEffect(() => {
@@ -85,18 +84,13 @@ const CreateListing = () => {
     );
   }
 
-  const update = (key, value) =>
-    setForm((prev) => ({ ...prev, [key]: value }));
-
   /* ================= SAVE DRAFT ================= */
   const saveDraft = async () => {
     const payload = {
       provider_id: user.id,
       deal_status: "draft",
       is_published: false,
-
       ...form,
-
       year_built: form.year_built ? Number(form.year_built) : null,
       floors: form.floors ? Number(form.floors) : null,
       beds: form.beds ? Number(form.beds) : null,
@@ -142,25 +136,22 @@ const CreateListing = () => {
     alert("Photos uploaded!");
   };
 
-  /* ================= SUBMIT FOR REVIEW ================= */
+  /* ================= SUBMIT ================= */
   const submitForReview = async () => {
-    if (!listingId) return;
-
     setSubmitting(true);
 
     const { error } = await supabase
       .from("off_market_listings")
       .update({
-  deal_status: "pending_review",
-  is_published: false
-})
-
+        deal_status: "pending_review",
+        is_published: false
+      })
       .eq("id", listingId);
 
     setSubmitting(false);
 
     if (error) {
-      alert("Error submitting listing for review.");
+      alert("Error submitting listing.");
       return;
     }
 
@@ -178,11 +169,7 @@ const CreateListing = () => {
             <div className="radio-grid">
               {["Wholesaler", "Property owner", "Licensed agent", "Representing the owner"].map((o) => (
                 <label key={o} className="radio-card">
-                  <input
-                    type="radio"
-                    checked={form.deal_type === o}
-                    onChange={() => update("deal_type", o)}
-                  />
+                  <input type="radio" checked={form.deal_type === o} onChange={() => update("deal_type", o)} />
                   <span>{o}</span>
                 </label>
               ))}
@@ -200,11 +187,7 @@ const CreateListing = () => {
             <div className="radio-grid">
               {["ASAP (0–30 days)", "1–3 months", "3–6 months", "Just testing the market"].map((o) => (
                 <label key={o} className="radio-card">
-                  <input
-                    type="radio"
-                    checked={form.seller_motivation === o}
-                    onChange={() => update("seller_motivation", o)}
-                  />
+                  <input type="radio" checked={form.seller_motivation === o} onChange={() => update("seller_motivation", o)} />
                   <span>{o}</span>
                 </label>
               ))}
@@ -222,8 +205,33 @@ const CreateListing = () => {
             <h2>Property location</h2>
             <div className="input-grid">
               <input placeholder="Street" onChange={(e) => update("street", e.target.value)} />
-              <input placeholder="City" onChange={(e) => update("city", e.target.value)} />
-              <input placeholder="State" onChange={(e) => update("state", e.target.value)} />
+
+              <select
+                value={selectedState}
+                onChange={(e) => {
+                  setSelectedState(e.target.value);
+                  update("state", e.target.value);
+                  update("city", "");
+                }}
+              >
+                <option value="">Select state</option>
+                {Object.keys(citiesByState).map((state) => (
+                  <option key={state} value={state}>{state}</option>
+                ))}
+              </select>
+
+              <select
+                value={form.city}
+                disabled={!selectedState}
+                onChange={(e) => update("city", e.target.value)}
+              >
+                <option value="">Select city</option>
+                {selectedState &&
+                  citiesByState[selectedState].map((city) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+              </select>
+
               <input placeholder="ZIP" onChange={(e) => update("zip", e.target.value)} />
             </div>
             <div className="question-actions">
@@ -233,12 +241,20 @@ const CreateListing = () => {
           </div>
         )}
 
-        {/* STEP 4 – PROPERTY DETAILS */}
+        {/* STEP 4 – PROPERTY */}
         {step === 4 && (
           <div className="review-card">
             <h2>Property details</h2>
             <div className="input-grid">
-              <input placeholder="Property type" onChange={(e) => update("property_type", e.target.value)} />
+              <select onChange={(e) => update("property_type", e.target.value)}>
+                <option value="">Property type</option>
+                <option value="SFR">Single Family</option>
+                <option value="Multifamily">Multifamily</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Mixed-Use">Mixed-Use</option>
+                <option value="Land">Land</option>
+                <option value="Other">Other</option>
+              </select>
               <input placeholder="Year built" onChange={(e) => update("year_built", e.target.value)} />
               <input placeholder="Floors / Stories" onChange={(e) => update("floors", e.target.value)} />
             </div>
@@ -249,7 +265,7 @@ const CreateListing = () => {
           </div>
         )}
 
-        {/* STEP 5 – SIZE */}
+        {/* STEP 5 */}
         {step === 5 && (
           <div className="review-card">
             <h2>Size & layout</h2>
@@ -265,7 +281,7 @@ const CreateListing = () => {
           </div>
         )}
 
-        {/* STEP 6 – DEAL NUMBERS */}
+        {/* STEP 6 */}
         {step === 6 && (
           <div className="review-card">
             <h2>Deal numbers</h2>
@@ -280,7 +296,7 @@ const CreateListing = () => {
           </div>
         )}
 
-        {/* STEP 7 – CONTACT */}
+        {/* STEP 7 */}
         {step === 7 && (
           <div className="review-card">
             <h2>Contact information</h2>
@@ -288,33 +304,23 @@ const CreateListing = () => {
               <input placeholder="Phone number" onChange={(e) => update("contact_phone", e.target.value)} />
               <input placeholder="Email address" onChange={(e) => update("contact_email", e.target.value)} />
             </div>
-            <textarea
-              placeholder="Additional notes for buyers…"
-              onChange={(e) => update("description", e.target.value)}
-            />
+            <textarea placeholder="Additional notes…" onChange={(e) => update("description", e.target.value)} />
             <div className="question-actions">
               <button onClick={() => setStep(6)}>Back</button>
-              <button className="btn-primary" onClick={saveDraft}>
-                Save listing
-              </button>
+              <button className="btn-primary" onClick={saveDraft}>Save listing</button>
             </div>
           </div>
         )}
 
-        {/* STEP 8 – PHOTOS + SUBMIT */}
+        {/* STEP 8 */}
         {step === 8 && (
           <div className="question-card">
             <h2>Upload photos</h2>
             <input type="file" multiple accept="image/*" onChange={handlePhotoUpload} />
             {uploading && <p>Uploading photos…</p>}
-
             <div className="question-actions">
               <button onClick={() => setStep(7)}>Back</button>
-              <button
-                className="btn-primary"
-                disabled={submitting}
-                onClick={submitForReview}
-              >
+              <button className="btn-primary" disabled={submitting} onClick={submitForReview}>
                 {submitting ? "Submitting…" : "Submit for review"}
               </button>
             </div>

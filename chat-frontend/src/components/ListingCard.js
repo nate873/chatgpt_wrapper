@@ -4,15 +4,28 @@ import "./ListingCard.css";
 const ListingCard = ({ listing }) => {
   return (
     <div className="listing-card">
-      {/* IMAGE PLACEHOLDER */}
-      <div className="listing-image">
-        <span>Property</span>
-      </div>
+
+      {/* IMAGE */}
+   <div className="listing-image">
+
+  {/* PROPERTY TYPE BADGE */}
+  {listing.property_type && (
+    <div className="property-type-badge">
+      {listing.property_type}
+    </div>
+  )}
+
+  {listing.imageUrl ? (
+    <img src={listing.imageUrl} alt={listing.street} />
+  ) : (
+    <span>Property</span>
+  )}
+</div>
 
       {/* CONTENT */}
       <div className="listing-body">
         <h3 className="listing-title">
-          {listing.title?.trim() || "Untitled Property"}
+          {listing.street || "Off-Market Property"}
         </h3>
 
         <p className="listing-location">
@@ -26,16 +39,8 @@ const ListingCard = ({ listing }) => {
         )}
 
         <div className="listing-stats">
-          {listing.beds && (
-            <span>
-              <strong>{listing.beds}</strong> Beds
-            </span>
-          )}
-          {listing.baths && (
-            <span>
-              <strong>{listing.baths}</strong> Baths
-            </span>
-          )}
+          {listing.beds && <span><strong>{listing.beds}</strong> Beds</span>}
+          {listing.baths && <span><strong>{listing.baths}</strong> Baths</span>}
           {listing.sqft && (
             <span>
               <strong>{Number(listing.sqft).toLocaleString()}</strong> Sqft
