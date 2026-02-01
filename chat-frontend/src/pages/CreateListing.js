@@ -17,6 +17,7 @@ const CreateListing = () => {
   const [form, setForm] = useState({
     deal_type: "",
     seller_motivation: "",
+    contact_name: "",
     street: "",
     city: "",
     state: "",
@@ -36,6 +37,9 @@ const CreateListing = () => {
 
   const update = (key, value) =>
     setForm((prev) => ({ ...prev, [key]: value }));
+
+  // 🔒 Allow digits only (used ONLY for price & ARV)
+  const numericOnly = (value) => value.replace(/[^\d]/g, "");
 
   /* ================= AUTH ================= */
   useEffect(() => {
@@ -169,7 +173,11 @@ const CreateListing = () => {
             <div className="radio-grid">
               {["Wholesaler", "Property owner", "Licensed agent", "Representing the owner"].map((o) => (
                 <label key={o} className="radio-card">
-                  <input type="radio" checked={form.deal_type === o} onChange={() => update("deal_type", o)} />
+                  <input
+                    type="radio"
+                    checked={form.deal_type === o}
+                    onChange={() => update("deal_type", o)}
+                  />
                   <span>{o}</span>
                 </label>
               ))}
@@ -187,7 +195,11 @@ const CreateListing = () => {
             <div className="radio-grid">
               {["ASAP (0–30 days)", "1–3 months", "3–6 months", "Just testing the market"].map((o) => (
                 <label key={o} className="radio-card">
-                  <input type="radio" checked={form.seller_motivation === o} onChange={() => update("seller_motivation", o)} />
+                  <input
+                    type="radio"
+                    checked={form.seller_motivation === o}
+                    onChange={() => update("seller_motivation", o)}
+                  />
                   <span>{o}</span>
                 </label>
               ))}
@@ -204,7 +216,10 @@ const CreateListing = () => {
           <div className="review-card">
             <h2>Property location</h2>
             <div className="input-grid">
-              <input placeholder="Street" onChange={(e) => update("street", e.target.value)} />
+              <input
+                placeholder="Street"
+                onChange={(e) => update("street", e.target.value)}
+              />
 
               <select
                 value={selectedState}
@@ -232,7 +247,10 @@ const CreateListing = () => {
                   ))}
               </select>
 
-              <input placeholder="ZIP" onChange={(e) => update("zip", e.target.value)} />
+              <input
+                placeholder="ZIP"
+                onChange={(e) => update("zip", e.target.value)}
+              />
             </div>
             <div className="question-actions">
               <button onClick={() => setStep(2)}>Back</button>
@@ -255,8 +273,16 @@ const CreateListing = () => {
                 <option value="Land">Land</option>
                 <option value="Other">Other</option>
               </select>
-              <input placeholder="Year built" onChange={(e) => update("year_built", e.target.value)} />
-              <input placeholder="Floors / Stories" onChange={(e) => update("floors", e.target.value)} />
+
+              <input
+                placeholder="Year built"
+                onChange={(e) => update("year_built", e.target.value)}
+              />
+
+              <input
+                placeholder="Floors / Stories"
+                onChange={(e) => update("floors", e.target.value)}
+              />
             </div>
             <div className="question-actions">
               <button onClick={() => setStep(3)}>Back</button>
@@ -281,13 +307,24 @@ const CreateListing = () => {
           </div>
         )}
 
-        {/* STEP 6 */}
+        {/* STEP 6 – DEAL NUMBERS (NUMERIC ONLY) */}
         {step === 6 && (
           <div className="review-card">
             <h2>Deal numbers</h2>
             <div className="input-grid">
-              <input placeholder="Asking price" onChange={(e) => update("price", e.target.value)} />
-              <input placeholder="Estimated ARV" onChange={(e) => update("arv", e.target.value)} />
+              <input
+                placeholder="Asking price"
+                inputMode="numeric"
+                value={form.price}
+                onChange={(e) => update("price", numericOnly(e.target.value))}
+              />
+
+              <input
+                placeholder="Estimated ARV"
+                inputMode="numeric"
+                value={form.arv}
+                onChange={(e) => update("arv", numericOnly(e.target.value))}
+              />
             </div>
             <div className="question-actions">
               <button onClick={() => setStep(5)}>Back</button>
@@ -301,10 +338,29 @@ const CreateListing = () => {
           <div className="review-card">
             <h2>Contact information</h2>
             <div className="input-grid">
-              <input placeholder="Phone number" onChange={(e) => update("contact_phone", e.target.value)} />
-              <input placeholder="Email address" onChange={(e) => update("contact_email", e.target.value)} />
-            </div>
-            <textarea placeholder="Additional notes…" onChange={(e) => update("description", e.target.value)} />
+  <input
+    placeholder="Contact name"
+    value={form.contact_name}
+    onChange={(e) => update("contact_name", e.target.value)}
+  />
+
+  <input
+    placeholder="Phone number"
+    value={form.contact_phone}
+    onChange={(e) => update("contact_phone", e.target.value)}
+  />
+
+  <input
+    placeholder="Email address"
+    value={form.contact_email}
+    onChange={(e) => update("contact_email", e.target.value)}
+  />
+</div>
+
+            <textarea
+              placeholder="Additional notes…"
+              onChange={(e) => update("description", e.target.value)}
+            />
             <div className="question-actions">
               <button onClick={() => setStep(6)}>Back</button>
               <button className="btn-primary" onClick={saveDraft}>Save listing</button>
@@ -320,7 +376,11 @@ const CreateListing = () => {
             {uploading && <p>Uploading photos…</p>}
             <div className="question-actions">
               <button onClick={() => setStep(7)}>Back</button>
-              <button className="btn-primary" disabled={submitting} onClick={submitForReview}>
+              <button
+                className="btn-primary"
+                disabled={submitting}
+                onClick={submitForReview}
+              >
                 {submitting ? "Submitting…" : "Submit for review"}
               </button>
             </div>

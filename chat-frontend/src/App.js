@@ -17,6 +17,7 @@ import TermsPage from "./pages/TermsPage";
 import ChatPage from "./pages/ChatPage";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import OffMarketProperties from "./pages/OffMarketProperties";
+import OffMarketListing from "./pages/OffMarketListing"; // 👈 NEW
 
 // ================= PROVIDER PAGES =================
 import ProviderDashboard from "./pages/ProviderDashboard";
@@ -49,7 +50,10 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsPage />} />
+
+        {/* OFF-MARKET */}
         <Route path="/off-market" element={<OffMarketProperties />} />
+        <Route path="/off-market/:id" element={<OffMarketListing />} /> {/* 👈 NEW */}
       </Route>
 
       {/* ================= PROTECTED (AUTH REQUIRED) ================= */}

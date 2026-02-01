@@ -1,26 +1,32 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./ListingCard.css";
 
 const ListingCard = ({ listing }) => {
+  const navigate = useNavigate();
+
   return (
-    <div className="listing-card">
-
+    <div
+      className="listing-card"
+      onClick={() => navigate(`/off-market/${listing.id}`)}
+      style={{ cursor: "pointer" }}
+    >
       {/* IMAGE */}
-   <div className="listing-image">
+      <div className="listing-image">
 
-  {/* PROPERTY TYPE BADGE */}
-  {listing.property_type && (
-    <div className="property-type-badge">
-      {listing.property_type}
-    </div>
-  )}
+        {/* PROPERTY TYPE BADGE */}
+        {listing.property_type && (
+          <div className="property-type-badge">
+            {listing.property_type}
+          </div>
+        )}
 
-  {listing.imageUrl ? (
-    <img src={listing.imageUrl} alt={listing.street} />
-  ) : (
-    <span>Property</span>
-  )}
-</div>
+        {listing.imageUrl ? (
+          <img src={listing.imageUrl} alt={listing.street} />
+        ) : (
+          <span>Property</span>
+        )}
+      </div>
 
       {/* CONTENT */}
       <div className="listing-body">
@@ -48,7 +54,14 @@ const ListingCard = ({ listing }) => {
           )}
         </div>
 
-        <button className="analyze-btn">
+        {/* Stop click so button doesn't trigger card navigation */}
+        <button
+          className="analyze-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/off-market/${listing.id}`);
+          }}
+        >
           Analyze Deal →
         </button>
       </div>
