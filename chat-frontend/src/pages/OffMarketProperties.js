@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
+import ListingCard from "../components/ListingCard";
 import "./OffMarketProperties.css";
 
 const OffMarketProperties = () => {
@@ -8,17 +9,24 @@ const OffMarketProperties = () => {
 
   useEffect(() => {
     const fetchListings = async () => {
+      setLoading(true);
+
       const { data, error } = await supabase
         .from("off_market_listings")
         .select(`
           id,
           title,
-          property_type,
+          street,
           city,
           state,
+          property_type,
           price,
           arv,
+          beds,
+          baths,
+          sqft,
           description,
+          photos,
           created_at
         `)
         .eq("is_published", true)
@@ -27,6 +35,7 @@ const OffMarketProperties = () => {
 
       if (error) {
         console.error("Error loading off-market listings:", error);
+        setListings([]);
       } else {
         setListings(data || []);
       }
@@ -40,7 +49,8 @@ const OffMarketProperties = () => {
   return (
     <div className="offmarket-content">
       <div className="offmarket-shell">
-        {/* INTRO */}
+
+        {/* ================= INTRO ================= */}
         <section className="offmarket-intro">
           <h1>Off-Market Properties</h1>
           <p>
@@ -49,9 +59,11 @@ const OffMarketProperties = () => {
           </p>
         </section>
 
-        {/* LISTINGS */}
+        {/* ================= LISTINGS ================= */}
         <section className="offmarket-grid">
-          {loading && <p className="loading">Loading listings…</p>}
+          {loading && (
+            <p className="loading">Loading listings…</p>
+          )}
 
           {!loading && listings.length === 0 && (
             <p className="empty">
@@ -59,47 +71,15 @@ const OffMarketProperties = () => {
             </p>
           )}
 
-          {listings.map((listing) => (
-            <div key={listing.id} className="offmarket-card">
-              <div className="card-header">
-                <h3>{listing.title}</h3>
-                <span className="badge">{listing.property_type}</span>
-              </div>
-
-              <div className="card-location">
-                {listing.city}, {listing.state}
-              </div>
-
-              <div className="card-metrics">
-                {listing.price && (
-                  <div>
-                    <span>Price</span>
-                    <strong>
-                      ${Number(listing.price).toLocaleString()}
-                    </strong>
-                  </div>
-                )}
-
-                {listing.arv && (
-                  <div>
-                    <span>ARV</span>
-                    <strong>
-                      ${Number(listing.arv).toLocaleString()}
-                    </strong>
-                  </div>
-                )}
-              </div>
-
-              <p className="card-description">
-                {listing.description?.slice(0, 120)}…
-              </p>
-
-              <button className="analyze-btn">
-                Analyze Deal →
-              </button>
-            </div>
-          ))}
+          {!loading &&
+            listings.map((listing) => (
+              <ListingCard
+                key={listing.id}
+                listing={listing}
+              />
+            ))}
         </section>
+
       </div>
     </div>
   );

@@ -151,9 +151,10 @@ const CreateListing = () => {
     const { error } = await supabase
       .from("off_market_listings")
       .update({
-        deal_status: "pending_review",
-        is_published: true
-      })
+  deal_status: "pending_review",
+  is_published: false
+})
+
       .eq("id", listingId);
 
     setSubmitting(false);
