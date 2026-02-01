@@ -6,25 +6,61 @@ const AdminRoute = ({ children }) => {
   const [allowed, setAllowed] = useState(null);
 
   useEffect(() => {
+    let mounted = true;
+
     const checkAdmin = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return setAllowed(false);
+      try {
+        const {
+          data: { user },
+          error: authError
+        } = await supabase.auth.getUser();
 
-      const { data } = await supabase
-        .from("profiles")
-        .select("is_admin")
-        .eq("id", user.id)
-        .single();
+        if (authError || !user) {
+          if (mounted) setAllowed(false);
+          return;
+        }
 
-      setAllowed(!!data?.is_admin);
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("is_admin")
+          .eq("id", user.id)
+          .single();
+
+        if (error) {
+          console.error("Admin check failed:", error);
+          if (mounted) setAllowed(false);
+          return;
+        }
+
+        if (mounted) setAllowed(Boolean(data?.is_admin));
+      } catch (err) {
+        console.error("AdminRoute error:", err);
+        if (mounted) setAllowed(false);
+      }
     };
 
     checkAdmin();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  if (allowed === null) return null; // loading
-  if (!allowed) return <Navigate to="/" />;
+  /* ===== Loading state ===== */
+  if (allowed === null) {
+    return (
+      <div style={{ padding: "2rem", color: "#9ca3af" }}>
+        Checking permissions…
+      </div>
+    );
+  }
 
+  /* ===== Not allowed ===== */
+  if (!allowed) {
+    return <Navigate to="/provider" replace />;
+  }
+
+  /* ===== Allowed ===== */
   return children;
 };
 

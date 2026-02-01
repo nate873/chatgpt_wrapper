@@ -23,7 +23,7 @@ import ProviderDashboard from "./pages/ProviderDashboard";
 import CreateListing from "./pages/CreateListing";
 
 // ================= ADMIN PAGES =================
-import AdminProviders from "./pages/AdminProviders";
+import AdminListings from "./pages/AdminListings";
 
 // ================= LAYOUT + PROTECTION =================
 import AppLayout from "./layouts/AppLayout";
@@ -78,7 +78,7 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="/admin/providers" element={<AdminProviders />} />
+        <Route path="/admin/listings" element={<AdminListings />} />
       </Route>
 
       {/* ================= FALLBACK ================= */}
