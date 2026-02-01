@@ -75,22 +75,34 @@ const OffMarketListing = () => {
       <div className="about-container offmarket-detail">
 
         {/* ================= GALLERY ================= */}
-        <section className="listing-gallery">
-          {images.length ? (
-            <>
-              <img src={images[0]} alt="Property" />
-              {images.length > 1 && (
-                <div className="listing-gallery-thumbs">
-                  {images.slice(1).map((src, i) => (
-                    <img key={i} src={src} alt="Property thumbnail" />
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="gallery-placeholder">No photos available</div>
-          )}
-        </section>
+      {/* ================= GALLERY ================= */}
+<section className="listing-gallery">
+  {images.length > 0 ? (
+    <>
+      {/* LEFT: HERO IMAGE */}
+      <div className="gallery-hero">
+        <img src={images[0]} alt="Property main" />
+
+        {images.length > 5 && (
+          <div className="gallery-viewall">
+            View all {images.length} photos
+          </div>
+        )}
+      </div>
+
+      {/* RIGHT: 4 IMAGE GRID */}
+      <div className="gallery-thumbs">
+        {images.slice(1, 5).map((src, i) => (
+          <img key={i} src={src} alt={`Property ${i + 2}`} />
+        ))}
+      </div>
+    </>
+  ) : (
+    <div className="gallery-placeholder">No photos available</div>
+  )}
+</section>
+
+
 
         {/* ================= HEADER ================= */}
         <section className="listing-header">

@@ -13,59 +13,111 @@
    GALLERY (HERO + THUMBNAILS)
    ========================================================= */
 
+/* =========================================================
+   GALLERY — ZILLOW STYLE
+   ========================================================= */
+
+/* =========================================================
+   ZILLOW-STYLE GALLERY (HALF + GRID)
+   ========================================================= */
+
 .listing-gallery {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  margin-bottom: 42px;
-}
-
-/* Hero image */
-.listing-gallery img:first-child {
-  width: 100%;
+  grid-template-columns: 1fr 1fr;
   height: 420px;
-  object-fit: cover;
-  border-radius: 22px;
-  background: linear-gradient(180deg, #0b1220, #020617);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  gap: 10px;
+  margin-bottom: 40px;
+  border-radius: 18px;
+  overflow: hidden;
 }
 
-/* Thumbnail row */
-.listing-gallery-thumbs {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 12px;
+/* LEFT — HERO IMAGE */
+.gallery-hero {
+  position: relative;
+  overflow: hidden;
 }
 
-.listing-gallery-thumbs img {
-  height: 100px;
+.gallery-hero img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 14px;
   cursor: pointer;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+  transition: transform 0.3s ease;
 }
 
-.listing-gallery-thumbs img:hover {
-  transform: translateY(-2px);
-  border-color: rgba(96, 165, 250, 0.45);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+.gallery-hero img:hover {
+  transform: scale(1.04);
 }
 
-/* Placeholder */
+/* RIGHT — 4 IMAGE GRID */
+.gallery-thumbs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.gallery-thumbs img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.gallery-thumbs img:hover {
+  transform: scale(1.05);
+}
+
+/* VIEW ALL OVERLAY */
+.gallery-viewall {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  backdrop-filter: blur(6px);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.gallery-viewall:hover {
+  background: rgba(15, 23, 42, 0.95);
+}
+
+/* FALLBACK */
 .gallery-placeholder {
   height: 420px;
-  border-radius: 22px;
+  border-radius: 18px;
   background: linear-gradient(180deg, #0b1220, #020617);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #9ca3af;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.15);
 }
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .listing-gallery {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .gallery-hero {
+    height: 260px;
+  }
+
+  .gallery-thumbs {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 90px;
+  }
+}
+
 
 /* =========================================================
    HEADER
