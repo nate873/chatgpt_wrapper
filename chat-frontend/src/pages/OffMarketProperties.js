@@ -6,6 +6,7 @@ import "./OffMarketProperties.css";
 const OffMarketProperties = () => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedState, setSelectedState] = useState("");
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -61,6 +62,16 @@ const OffMarketProperties = () => {
     fetchListings();
   }, []);
 
+  // 🔍 Unique states for dropdown
+  const states = Array.from(
+    new Set(listings.map((l) => l.state).filter(Boolean))
+  ).sort();
+
+  // 🔍 Filtered listings
+  const filteredListings = selectedState
+    ? listings.filter((l) => l.state === selectedState)
+    : listings;
+
   return (
     <div className="offmarket-page">
       <div className="offmarket-shell">
@@ -73,21 +84,36 @@ const OffMarketProperties = () => {
           </p>
         </section>
 
+        {/* SEARCH */}
+        <section className="offmarket-search">
+          <select
+            value={selectedState}
+            onChange={(e) => setSelectedState(e.target.value)}
+          >
+            <option value="">All States</option>
+            {states.map((state) => (
+              <option key={state} value={state}>
+                {state}
+              </option>
+            ))}
+          </select>
+        </section>
+
         {/* GRID */}
         <section className="offmarket-grid">
           {loading && <p className="loading">Loading listings…</p>}
 
-          {!loading && listings.length === 0 && (
-            <p className="empty">No off-market properties available yet.</p>
+          {!loading && filteredListings.length === 0 && (
+            <p className="empty">No properties found for this state.</p>
           )}
 
           {!loading &&
-            listings.map((listing) => (
+            filteredListings.map((listing) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
         </section>
 
-        {/* ================= CTA ================= */}
+        {/* CTA */}
         <section className="offmarket-cta">
           <h2>Sign Up to View More Properties</h2>
 
