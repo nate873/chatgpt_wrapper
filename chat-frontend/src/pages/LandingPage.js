@@ -94,6 +94,37 @@ const LandingPage = () => {
                 <button type="submit">Ask AI →</button>
               </div>
             </form>
+            {/* ================= OFF-MARKET PREVIEW ================= */}
+<section
+  className="offmarket-preview"
+>
+  <div className="offmarket-preview-content">
+    <h2>Off-Market Properties</h2>
+
+    <ul className="offmarket-preview-features">
+      <li>✔ Curated off-market fix & flips</li>
+      <li>✔ Filter by state & property type</li>
+      <li>✔ Verified providers only</li>
+      <li>✔ Analyze deals instantly with AI</li>
+    </ul>
+
+    <button
+  className="offmarket-preview-btn"
+  onClick={() => (window.location.href = "/login")}
+>
+  Unlock Access →
+</button>
+
+  </div>
+
+  <div className="offmarket-preview-image">
+    <img
+      src="/offmarket.png"
+      alt="Off-market properties preview"
+    />
+  </div>
+</section>
+
 
             {/* ================= AI DEMO ================= */}
             <section className="ai-demo">
