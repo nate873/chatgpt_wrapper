@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
-import "./AppLayout.css";
 
 const AppLayout = () => {
   const [user, setUser] = useState(null);
@@ -46,14 +44,14 @@ const AppLayout = () => {
       <Header user={user} plan={plan} credits={credits} />
 
       <div className="app-shell">
-        <Sidebar
+        
           loggedIn={!!user}
             userId={user?.id}     
           onLogoutClick={async () => {
             await supabase.auth.signOut();
             setUser(null);
           }}
-        />
+        
 
         <main className="app-main">
           <Outlet
