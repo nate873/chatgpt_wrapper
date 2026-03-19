@@ -1,140 +1,256 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Header.css";
 import logo from "../logo.png";
 import { supabase } from "../supabaseClient";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Header = ({ user, plan, credits }) => {
-const [open, setOpen] = useState(false);
-const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [savedDealsOpen, setSavedDealsOpen] = useState(false);
+  const [dealSessions, setDealSessions] = useState([]);
+  const [loadingDeals, setLoadingDeals] = useState(false);
 
-const handleLogoClick = () => {
-if (user?.id) {
-navigate("/chat");
-} else {
-navigate("/");
-}
-};
+  const navigate = useNavigate();
+  const location = useLocation();
+  const savedDealsRef = useRef(null);
+  const accountMenuRef = useRef(null);
 
-const handleLogout = async () => {
-await supabase.auth.signOut();
-setOpen(false);
-navigate("/");
-};
+  const API_BASE = process.env.REACT_APP_API_BASE;
 
-const handleListProperty = () => {
-if (!user?.id) {
-navigate("/login");
-} else {
-navigate("/provider");
-}
-};
+  const activeSessionId = new URLSearchParams(location.search).get("session");
 
-return ( <header className="app-header">
-{/* LEFT */} <div className="header-left">
-<div
-className="header-brand"
-onClick={handleLogoClick}
-style={{ cursor: "pointer" }}
-> <img src={logo} alt="FlipBot" className="header-logo" /> </div>
+  const handleLogoClick = () => {
+    if (user?.id) {
+      navigate("/chat");
+    } else {
+      navigate("/");
+    }
+  };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setOpen(false);
+    navigate("/");
+  };
 
-    <nav className="header-nav">
-      <button
-        className="nav-item"
-        onClick={() => navigate("/about")}
-      >
-        About
-      </button>
+  const handleListProperty = () => {
+    if (!user?.id) {
+      navigate("/login");
+    } else {
+      navigate("/provider");
+    }
+  };
 
-      <button
-        className="nav-item"
-        onClick={() => navigate("/affiliate-program")}
-      >
-        Affiliate Program
-      </button>
+  useEffect(() => {
+    if (!user?.id) {
+      setDealSessions([]);
+      return;
+    }
 
-      <button
-        className="nav-item"
-        onClick={() => navigate("/wholesalers")}
-      >
-        Wholesalers
-      </button>
+    const fetchDeals = async () => {
+      setLoadingDeals(true);
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/deal-sessions?user_id=${user.id}`
+        );
+        const data = await res.json();
+        setDealSessions(data || []);
+      } catch (err) {
+        console.error("Failed to load deal sessions", err);
+      } finally {
+        setLoadingDeals(false);
+      }
+    };
 
-      <button
-        className="nav-item"
-        onClick={() => navigate("/realtors")}
-      >
-        Realtors
-      </button>
+    fetchDeals();
 
-      <button
-        className="nav-item primary"
-        onClick={handleListProperty}
-      >
-        List a Property
-      </button>
-    </nav>
-  </div>
+    const onDealCreated = () => fetchDeals();
+    window.addEventListener("deal-created", onDealCreated);
 
-  {/* RIGHT */}
-  <div className="header-right">
-    <button
-      className="upgrade-btn"
-      onClick={() => navigate("/pricing-plans")}
-    >
-      Pricing Plans
-    </button>
+    return () => {
+      window.removeEventListener("deal-created", onDealCreated);
+    };
+  }, [user?.id, API_BASE]);
 
-    <div className="account-menu">
-      <button
-        className="account-avatar"
-        onClick={() => setOpen((prev) => !prev)}
-      >
-        {user?.email?.[0]?.toUpperCase() || "U"}
-      </button>
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        savedDealsRef.current &&
+        !savedDealsRef.current.contains(event.target)
+      ) {
+        setSavedDealsOpen(false);
+      }
 
-      {open && (
-        <div className="account-dropdown">
-          <div className="account-email">
-            {user?.email || "Not signed in"}
-          </div>
+      if (
+        accountMenuRef.current &&
+        !accountMenuRef.current.contains(event.target)
+      ) {
+        setOpen(false);
+      }
+    };
 
-          <div className="account-meta">
-            <span>
-              Plan: <strong>{plan ?? "free"}</strong>
-            </span>
-            <span>
-              ⚡ Credits remaining:{" "}
-              <strong>{credits ?? 0}</strong>
-            </span>
-          </div>
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-          {plan === "free" && (
-            <button
-              className="dropdown-btn primary"
-              onClick={() => {
-                setOpen(false);
-                navigate("/pricing-plans");
-              }}
-            >
-              Start Free Trial
-            </button>
-          )}
+  return (
+    <header className="app-header">
+      <div className="header-left">
+        <div
+          className="header-brand"
+          onClick={handleLogoClick}
+          style={{ cursor: "pointer" }}
+        >
+          <img src={logo} alt="FlipBot" className="header-logo" />
+        </div>
+
+        <nav className="header-nav">
+          <button
+            className={`nav-item ${
+              location.pathname === "/chat" ? "active" : ""
+            }`}
+            onClick={() => navigate("/chat")}
+          >
+            Deal Chat
+          </button>
 
           <button
-            className="dropdown-btn"
-            onClick={handleLogout}
+            className={`nav-item ${
+              location.pathname === "/off-market" ? "active" : ""
+            }`}
+            onClick={() => navigate("/off-market")}
           >
-            Log out
+            Off Market Properties
           </button>
-        </div>
-      )}
-    </div>
-  </div>
-</header>
 
-);
+          {user?.id && (
+            <div className="saved-deals-menu" ref={savedDealsRef}>
+              <button
+                className={`nav-item ${
+                  savedDealsOpen ? "active" : ""
+                }`}
+                onClick={() => setSavedDealsOpen((prev) => !prev)}
+              >
+                Saved Deals
+              </button>
+
+              {savedDealsOpen && (
+                <div className="saved-deals-dropdown">
+                  <div className="saved-deals-dropdown-inner">
+                    <div className="saved-deals-title">Saved Deals</div>
+
+                    {loadingDeals && (
+                      <div className="saved-deal-empty">Loading...</div>
+                    )}
+
+                    {!loadingDeals && dealSessions.length === 0 && (
+                      <div className="saved-deal-empty">No saved deals yet</div>
+                    )}
+
+                    {!loadingDeals &&
+                      dealSessions.map((deal) => (
+                        <button
+                          key={deal.id}
+                          className={`saved-deal-item ${
+                            activeSessionId === deal.id ? "active" : ""
+                          }`}
+                          onClick={() => {
+                            setSavedDealsOpen(false);
+                            navigate(`/chat?session=${deal.id}`);
+                          }}
+                        >
+                          <div className="saved-deal-title">{deal.title}</div>
+                          <div className="saved-deal-date">
+                            {new Date(deal.created_at).toLocaleDateString()}
+                          </div>
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <button className="nav-item" onClick={() => navigate("/about")}>
+            About
+          </button>
+
+          <button
+            className="nav-item"
+            onClick={() => navigate("/affiliate-program")}
+          >
+            Affiliate Program
+          </button>
+
+          <button
+            className="nav-item"
+            onClick={() => navigate("/wholesalers")}
+          >
+            Wholesalers
+          </button>
+
+          <button className="nav-item" onClick={() => navigate("/realtors")}>
+            Realtors
+          </button>
+
+          <button className="nav-item primary" onClick={handleListProperty}>
+            List a Property
+          </button>
+        </nav>
+      </div>
+
+      <div className="header-right">
+        <button
+          className="upgrade-btn"
+          onClick={() => navigate("/pricing-plans")}
+        >
+          Pricing Plans
+        </button>
+
+        <div className="account-menu" ref={accountMenuRef}>
+          <button
+            className="account-avatar"
+            onClick={() => setOpen((prev) => !prev)}
+          >
+            {user?.email?.[0]?.toUpperCase() || "U"}
+          </button>
+
+          {open && (
+            <div className="account-dropdown">
+              <div className="account-email">
+                {user?.email || "Not signed in"}
+              </div>
+
+              <div className="account-meta">
+                <span>
+                  Plan: <strong>{plan ?? "free"}</strong>
+                </span>
+                <span>
+                  Credits remaining: <strong>{credits ?? 0}</strong>
+                </span>
+              </div>
+
+              {plan === "free" && (
+                <button
+                  className="dropdown-btn primary"
+                  onClick={() => {
+                    setOpen(false);
+                    navigate("/pricing-plans");
+                  }}
+                >
+                  Start Free Trial
+                </button>
+              )}
+
+              <button className="dropdown-btn" onClick={handleLogout}>
+                Log out
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
 };
 
 export default Header;
