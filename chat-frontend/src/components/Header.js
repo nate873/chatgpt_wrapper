@@ -96,11 +96,7 @@ const Header = ({ user, plan, credits }) => {
   return (
     <header className="app-header">
       <div className="header-left">
-        <div
-          className="header-brand"
-          onClick={handleLogoClick}
-          style={{ cursor: "pointer" }}
-        >
+        <div className="header-brand" onClick={handleLogoClick}>
           <img src={logo} alt="FlipBot" className="header-logo" />
         </div>
 
@@ -126,9 +122,7 @@ const Header = ({ user, plan, credits }) => {
           {user?.id && (
             <div className="saved-deals-menu" ref={savedDealsRef}>
               <button
-                className={`nav-item ${
-                  savedDealsOpen ? "active" : ""
-                }`}
+                className={`nav-item ${savedDealsOpen ? "active" : ""}`}
                 onClick={() => setSavedDealsOpen((prev) => !prev)}
               >
                 Saved Deals
