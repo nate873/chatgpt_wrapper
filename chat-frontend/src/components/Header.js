@@ -33,13 +33,7 @@ const Header = ({ user, plan, credits }) => {
     navigate("/");
   };
 
-  const handleListProperty = () => {
-    if (!user?.id) {
-      navigate("/login");
-    } else {
-      navigate("/provider");
-    }
-  };
+ 
 
   useEffect(() => {
     if (!user?.id) {
@@ -96,7 +90,11 @@ const Header = ({ user, plan, credits }) => {
   return (
     <header className="app-header">
       <div className="header-left">
-        <div className="header-brand" onClick={handleLogoClick}>
+        <div
+          className="header-brand"
+          onClick={handleLogoClick}
+          style={{ cursor: "pointer" }}
+        >
           <img src={logo} alt="FlipBot" className="header-logo" />
         </div>
 
@@ -107,16 +105,7 @@ const Header = ({ user, plan, credits }) => {
             }`}
             onClick={() => navigate("/chat")}
           >
-            Deal Chat
-          </button>
-
-          <button
-            className={`nav-item ${
-              location.pathname === "/off-market" ? "active" : ""
-            }`}
-            onClick={() => navigate("/off-market")}
-          >
-            Off Market Properties
+            Home
           </button>
 
           {user?.id && (
@@ -174,21 +163,6 @@ const Header = ({ user, plan, credits }) => {
             onClick={() => navigate("/affiliate-program")}
           >
             Affiliate Program
-          </button>
-
-          <button
-            className="nav-item"
-            onClick={() => navigate("/wholesalers")}
-          >
-            Wholesalers
-          </button>
-
-          <button className="nav-item" onClick={() => navigate("/realtors")}>
-            Realtors
-          </button>
-
-          <button className="nav-item primary" onClick={handleListProperty}>
-            List a Property
           </button>
         </nav>
       </div>

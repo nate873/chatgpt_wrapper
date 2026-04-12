@@ -1,8 +1,19 @@
 /* =========================
-   PAGE LAYOUT
+   PAGE WRAPPER (LIGHT THEME)
 ========================= */
 
+.pricing-page {
+  min-height: 100vh;
+  padding: 4rem 2rem;
+  box-sizing: border-box;
 
+  background: #ffffff;
+  color: #111827;
+}
+
+/* =========================
+   TITLE
+========================= */
 
 .pricing-title {
   text-align: center;
@@ -10,7 +21,8 @@
   font-size: 3rem;
   font-weight: 800;
   margin-bottom: 1.25rem;
-  color: #ffffff;
+  color: #111827;
+  letter-spacing: -0.02em;
 }
 
 /* =========================
@@ -25,22 +37,36 @@
 }
 
 .pricing-toggle button {
-  padding: 0.45rem 1.25rem;
+  padding: 0.5rem 1.25rem;
   border-radius: 999px;
-  background: #151515;
-  color: #aaa;
-  border: none;
+
+  background: #f3f4f6;
+  color: #6b7280;
+
+  border: 1px solid #e5e7eb;
+
   font-family: "Plus Jakarta Sans", sans-serif;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pricing-toggle button:hover {
+  transform: translateY(-1px);
+  border-color: #4ea1ff;
+  color: #111827;
+  background: #eef5ff;
 }
 
 .pricing-toggle .active {
-  background: #ffffff;
-  color: #4f6bff;
+  background: linear-gradient(135deg, #4ea1ff, #6b8cff);
+  color: #fff;
+  border: none;
+  box-shadow: 0 10px 25px rgba(78, 161, 255, 0.25);
 }
 
 /* =========================
-   GRID (THIS IS THE FIX)
+   GRID
 ========================= */
 
 .pricing-grid {
@@ -53,32 +79,36 @@
 }
 
 /* =========================
-   CARDS
+   CARDS (LIGHT GLASS / MODERN)
 ========================= */
 
 .pricing-card {
   position: relative;
-  background: radial-gradient(
-    circle at top,
-    rgba(79, 107, 255, 0.08),
-    rgba(0, 0, 0, 0.9)
-  );
   border-radius: 18px;
   padding: 2.5rem 2rem;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow:
-    0 0 0 rgba(79, 107, 255, 0),
-    0 30px 60px rgba(0, 0, 0, 0.6);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border 0.25s ease;
+
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+/* scroll reveal */
+.pricing-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .pricing-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 0 60px rgba(79, 107, 255, 0.25),
-    0 40px 80px rgba(0, 0, 0, 0.8);
+  transform: translateY(-6px);
+  border-color: #4ea1ff;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.1);
 }
 
 /* =========================
@@ -98,18 +128,18 @@
 }
 
 .badge.current {
-  background: #3cff9a;
-  color: #002b12;
+  background: #dcfce7;
+  color: #166534;
 }
 
 .badge.popular-badge {
-  background: #4f6bff;
-  color: white;
+  background: #dbeafe;
+  color: #1d4ed8;
 }
 
 .badge.best {
-  background: #ffb800;
-  color: #1b1200;
+  background: #fef3c7;
+  color: #92400e;
 }
 
 /* =========================
@@ -120,18 +150,20 @@
   font-size: 1.4rem;
   font-weight: 700;
   margin-bottom: 0.75rem;
+  color: #111827;
 }
 
 .price {
   font-size: 3.2rem;
   font-weight: 900;
   margin-bottom: 1.5rem;
+  color: #111827;
 }
 
 .price span {
   font-size: 1rem;
   font-weight: 500;
-  opacity: 0.75;
+  opacity: 0.6;
   margin-left: 0.25rem;
 }
 
@@ -151,11 +183,12 @@
   align-items: center;
   font-size: 0.95rem;
   margin-bottom: 0.75rem;
+  color: #4b5563;
 }
 
 .pricing-card li::before {
   content: "✔";
-  color: #3cff9a;
+  color: #22c55e;
   font-weight: 700;
 }
 
@@ -165,26 +198,35 @@
 
 .choose-btn {
   width: 100%;
-  margin-top: 1rem;
-  padding: 0.75rem;
+  margin-top: 1.2rem;
+  padding: 0.85rem;
   border-radius: 999px;
   border: none;
-  background: linear-gradient(135deg, #4f6bff, #6b8cff);
+
+  background: linear-gradient(135deg, #4ea1ff, #6b8cff);
   color: white;
+
   font-weight: 700;
-  font-family: "Plus Jakarta Sans", sans-serif;
   cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.choose-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(78, 161, 255, 0.3);
 }
 
 .choose-btn:disabled {
-  background: #1c1c1c;
-  color: #777;
-  cursor: default;
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .premium-btn {
-  background: linear-gradient(135deg, #ffb800, #ffd36b);
-  color: #1b1200;
+  background: linear-gradient(135deg, #fbbf24, #fcd34d);
+  color: #1f2937;
 }
 
 /* =========================
@@ -195,51 +237,18 @@
   .pricing-grid {
     grid-template-columns: 1fr;
   }
-}
-/* =========================
-   PRICING PAGE FIXES
-========================= */
 
-/* =========================
-   PRICING PAGE LAYOUT FIX
-========================= */
-
-/* Wrap the pricing page content */
-.pricing-page {
-  padding-left: 260px; /* match sidebar width */
-  padding-right: 2rem;
-  padding-top: 3rem;
-  box-sizing: border-box;
-}
-
-/* Ensure grid never touches edges */
-.pricing-grid {
-  width: 100%;
-  max-width: 1150px;
-  margin: 0 auto;
-}
-
-/* Prevent card clipping */
-.pricing-card {
-  min-width: 0;
-}
-
-/* =========================
-   RESPONSIVE SIDEBAR FIX
-========================= */
-
-@media (max-width: 1024px) {
   .pricing-page {
     padding-left: 0;
-  }
-
-  .pricing-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
 
 @media (max-width: 640px) {
   .pricing-page {
     padding: 1.5rem 1rem;
+  }
+
+  .pricing-title {
+    font-size: 2.2rem;
   }
 }

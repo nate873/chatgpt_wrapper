@@ -34,6 +34,31 @@ const PricingPlans = () => {
   }, []);
 
   // -----------------------------
+  // Scroll reveal animation (THIS WAS MISSING)
+  // -----------------------------
+  useEffect(() => {
+    const elements = document.querySelectorAll(".reveal");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      {
+        threshold: 0.15,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  // -----------------------------
   // Stripe Checkout
   // -----------------------------
   const startCheckout = async (selectedPlan) => {
@@ -68,7 +93,7 @@ const PricingPlans = () => {
   };
 
   // -----------------------------
-  // Stripe Billing Portal
+  // Billing portal
   // -----------------------------
   const openBillingPortal = async () => {
     if (!user) return;
@@ -107,35 +132,33 @@ const PricingPlans = () => {
 
   return (
     <main className="pricing-page">
-      <h1 className="pricing-title">Pricing Plans</h1>
 
-      {/* 🔥 Manage Billing */}
+      <h1 className="pricing-title reveal">Pricing Plans</h1>
+
       {plan !== "free" && (
         <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
-          <button
-            className="secondary-btn"
-            onClick={openBillingPortal}
-          >
+          <button className="secondary-btn" onClick={openBillingPortal}>
             Manage Billing / Cancel Subscription
           </button>
         </div>
       )}
 
-      <div className="pricing-toggle">
+      <div className="pricing-toggle reveal">
         <button className="active">Monthly</button>
         <button disabled>Annually</button>
       </div>
 
       <div className="pricing-grid">
+
         {/* FREE */}
-        <div className="pricing-card">
+        <div className="pricing-card reveal">
           {plan === "free" && (
             <div className="badge current">Current Plan</div>
           )}
+
           <h2>Free</h2>
-          <p className="price">
-            $0<span>/month</span>
-          </p>
+          <p className="price">$0<span>/month</span></p>
+
           <ul>
             <li>10 research credits / month</li>
             <li>Limited searches</li>
@@ -144,12 +167,12 @@ const PricingPlans = () => {
         </div>
 
         {/* PRO */}
-        <div className="pricing-card popular">
+        <div className="pricing-card reveal">
           <div className="badge popular-badge">POPULAR</div>
+
           <h2>Pro</h2>
-          <p className="price">
-            $22.95<span>/month</span>
-          </p>
+          <p className="price">$22.95<span>/month</span></p>
+
           <button
             className="choose-btn"
             disabled={plan === "pro"}
@@ -157,6 +180,7 @@ const PricingPlans = () => {
           >
             {plan === "pro" ? "Current Plan" : "Choose This Plan"}
           </button>
+
           <ul>
             <li>1,000 credits / month</li>
             <li>Unlimited deal analysis</li>
@@ -166,12 +190,12 @@ const PricingPlans = () => {
         </div>
 
         {/* PREMIUM */}
-        <div className="pricing-card premium">
+        <div className="pricing-card reveal">
           <div className="badge best">BEST VALUE</div>
+
           <h2>Premium</h2>
-          <p className="price">
-            $29.95<span>/month</span>
-          </p>
+          <p className="price">$29.95<span>/month</span></p>
+
           <button
             className="choose-btn premium-btn"
             disabled={plan === "premium"}
@@ -179,6 +203,7 @@ const PricingPlans = () => {
           >
             {plan === "premium" ? "Current Plan" : "Choose This Plan"}
           </button>
+
           <ul>
             <li>3,000 credits / month</li>
             <li>Everything in Pro</li>
@@ -186,6 +211,7 @@ const PricingPlans = () => {
             <li>Maximum AI analysis</li>
           </ul>
         </div>
+
       </div>
     </main>
   );

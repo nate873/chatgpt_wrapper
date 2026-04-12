@@ -34,13 +34,30 @@ const ChatPage = () => {
     listingLimit: "25",
   });
 
+  // Financial metrics override state — values here take precedence over auto-generated ones
+  const [finOverrides, setFinOverrides] = useState({
+    holdMonths: "12",
+    vacancyRate: "5",
+    expenseRate: "35",
+    saleClosingCostPct: "6",
+    riskFreeRate: "4.5",
+    beta: "0.7",
+    marketReturn: "10",
+    loanAmount: "",
+    annualDebtService: "",
+    equityValue: "",
+    taxRate: "0",
+  });
+
+  // Which result message tab is currently expanded ("deal" | "finance")
+  const [activeResultTab, setActiveResultTab] = useState({});
+
   const [isThinking, setIsThinking] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
     const removeInjectedLoginText = () => {
       const bodyNodes = Array.from(document.body.childNodes);
-
       bodyNodes.forEach((node) => {
         if (
           node.nodeType === Node.TEXT_NODE &&
@@ -118,12 +135,15 @@ const ChatPage = () => {
     });
   };
 
+  const formatPct = (value) => {
+    if (value === null || value === undefined || value === "") return "—";
+    return `${Number(value).toFixed(2)}%`;
+  };
+
   const formatCompactValue = (value, key = "") => {
     if (value === null || value === undefined || value === "") return "—";
 
-    if (typeof value === "boolean") {
-      return value ? "Yes" : "No";
-    }
+    if (typeof value === "boolean") return value ? "Yes" : "No";
 
     if (typeof value === "number") {
       if (/(price|value|amount|arv|rent|budget|cost|basis|sale)/i.test(key)) {
@@ -140,9 +160,7 @@ const ChatPage = () => {
       return `${value.length} item${value.length === 1 ? "" : "s"}`;
     }
 
-    if (typeof value === "object") {
-      return "View details below";
-    }
+    if (typeof value === "object") return "View details below";
 
     return String(value);
   };
@@ -174,12 +192,11 @@ const ChatPage = () => {
       "listingType",
     ];
 
-    const chosen = preferredKeys.filter((key) => item[key] !== undefined && item[key] !== null);
+    const chosen = preferredKeys.filter(
+      (key) => item[key] !== undefined && item[key] !== null
+    );
 
-    if (chosen.length === 0) {
-      return Object.entries(item).slice(0, 6);
-    }
-
+    if (chosen.length === 0) return Object.entries(item).slice(0, 6);
     return chosen.map((key) => [key, item[key]]);
   };
 
@@ -189,18 +206,11 @@ const ChatPage = () => {
     if (name === "purchasePrice" || name === "rehabBudget") {
       const clean = unformatNumber(value);
       if (!/^\d*$/.test(clean)) return;
-
-      setDeal((prev) => ({
-        ...prev,
-        [name]: clean,
-      }));
+      setDeal((prev) => ({ ...prev, [name]: clean }));
       return;
     }
 
-    setDeal((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setDeal((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleLandChange = (e) => {
@@ -210,33 +220,78 @@ const ChatPage = () => {
       ["radius", "minLotSize", "maxLotSize", "limit", "offset", "listingLimit"].includes(name)
     ) {
       const clean = unformatNumber(value);
-
       if (name === "radius") {
         if (!/^\d*\.?\d*$/.test(clean)) return;
       } else {
         if (!/^\d*$/.test(clean)) return;
       }
-
-      setLandSearch((prev) => ({
-        ...prev,
-        [name]: clean,
-      }));
+      setLandSearch((prev) => ({ ...prev, [name]: clean }));
       return;
     }
 
     if (type === "checkbox") {
-      setLandSearch((prev) => ({
-        ...prev,
-        [name]: checked,
-      }));
+      setLandSearch((prev) => ({ ...prev, [name]: checked }));
       return;
     }
 
-    setLandSearch((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setLandSearch((prev) => ({ ...prev, [name]: value }));
   };
+
+  const handleFinOverrideChange = (e) => {
+    const { name, value } = e.target;
+    setFinOverrides((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // ─── Build financial-metrics payload from analyze result + overrides ────────
+  const buildFinancialPayload = (analyzeData, overrides) => {
+    const ds = analyzeData?.deal_summary || {};
+    const purchasePrice = ds.purchase_price || 0;
+    const rehabBudget = ds.rehab_budget || 0;
+    const totalBasis = ds.total_basis || purchasePrice + rehabBudget;
+    const estimatedRent = ds.estimated_rent || 0;
+    const estimatedValue = ds.estimated_value || 0;
+
+    const holdMonths = Math.max(1, parseInt(overrides.holdMonths) || 12);
+    const vacancyRate = parseFloat(overrides.vacancyRate) || 5;
+    const expenseRate = parseFloat(overrides.expenseRate) || 35;
+    const saleClosingCostPct = parseFloat(overrides.saleClosingCostPct) || 6;
+
+    // Effective monthly rent after vacancy
+    const effectiveMonthlyRent = estimatedRent * (1 - vacancyRate / 100);
+
+    // NOI = annual effective rent minus operating expenses (excludes debt service)
+    const annualEffectiveRent = effectiveMonthlyRent * 12;
+    const noi = annualEffectiveRent * (1 - expenseRate / 100);
+
+    // Monthly net cash flow during hold (rent - vacancy - expenses, before debt service)
+    const monthlyNetCashFlow = noi / 12;
+
+    // Net sale proceeds at end of hold
+    const saleProceeds = estimatedValue * (1 - saleClosingCostPct / 100);
+
+    // Cash flow array: monthly income for holdMonths, last month adds sale proceeds
+    const cashFlows = Array.from({ length: holdMonths }, (_, i) => {
+      const base = monthlyNetCashFlow;
+      return i === holdMonths - 1 ? base + saleProceeds : base;
+    });
+
+    return {
+      initial_investment: totalBasis,
+      cash_flows: cashFlows,
+      net_operating_income: noi,
+      risk_free_rate: parseFloat(overrides.riskFreeRate) || 4.5,
+      beta: parseFloat(overrides.beta) || 0.7,
+      market_return: parseFloat(overrides.marketReturn) || 10,
+      loan_amount: overrides.loanAmount ? parseFloat(overrides.loanAmount) : undefined,
+      annual_debt_service: overrides.annualDebtService
+        ? parseFloat(overrides.annualDebtService)
+        : undefined,
+      equity_value: overrides.equityValue ? parseFloat(overrides.equityValue) : undefined,
+      tax_rate: parseFloat(overrides.taxRate) || 0,
+    };
+  };
+
+  // ─── Submit handlers ──────────────────────────────────────────────────────
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -244,11 +299,7 @@ const ChatPage = () => {
     if (mode === "mystery") {
       setMessages((prev) => [
         ...prev,
-        {
-          id: Date.now(),
-          sender: "ai",
-          text: "Mystery is coming soon.",
-        },
+        { id: Date.now(), sender: "ai", text: "Mystery is coming soon." },
       ]);
       setTimeout(scrollToBottom, 100);
       return;
@@ -266,10 +317,11 @@ const ChatPage = () => {
         rehabBudget: Number(deal.rehabBudget || 0),
       };
 
+      const userMsgId = Date.now();
       setMessages((prev) => [
         ...prev,
         {
-          id: Date.now(),
+          id: userMsgId,
           sender: "user",
           text: `${payload.address} | Purchase: $${formatNumber(payload.purchasePrice)}${
             payload.rehabBudget ? ` | Rehab: $${formatNumber(payload.rehabBudget)}` : ""
@@ -282,31 +334,50 @@ const ChatPage = () => {
       try {
         const res = await fetch(`${API_BASE}/analyze`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
 
-        const data = await res.json().catch(() => ({}));
+        const analyzeData = await res.json().catch(() => ({}));
 
         if (!res.ok) {
           const errorMessage =
-            typeof data.detail === "string"
-              ? data.detail
-              : JSON.stringify(data.detail, null, 2);
-
+            typeof analyzeData.detail === "string"
+              ? analyzeData.detail
+              : JSON.stringify(analyzeData.detail, null, 2);
           throw new Error(errorMessage || "Error fetching comps.");
         }
 
+        // Auto-run financial metrics using current overrides
+        let finData = null;
+        try {
+          const finPayload = buildFinancialPayload(analyzeData, finOverrides);
+          const finRes = await fetch(`${API_BASE}/financial-metrics`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(finPayload),
+          });
+          finData = await finRes.json().catch(() => null);
+          if (!finRes.ok) finData = null;
+        } catch {
+          finData = null;
+        }
+
+        const aiMsgId = Date.now() + 1;
         setMessages((prev) => [
           ...prev,
           {
-            id: Date.now(),
+            id: aiMsgId,
             sender: "ai",
-            data,
+            data: analyzeData,
+            finData,
+            finPayload: buildFinancialPayload(analyzeData, finOverrides),
+            analyzeData, // store for re-running fin metrics
           },
         ]);
+
+        // Default to deal tab
+        setActiveResultTab((prev) => ({ ...prev, [aiMsgId]: "deal" }));
       } catch (err) {
         setMessages((prev) => [
           ...prev,
@@ -324,6 +395,7 @@ const ChatPage = () => {
       return;
     }
 
+    // ── Land search ──────────────────────────────────────────────────────────
     if (!landSearch.zipCode.trim()) {
       alert("Enter a ZIP code for property search.");
       return;
@@ -359,9 +431,7 @@ const ChatPage = () => {
     try {
       const res = await fetch(`${API_BASE}/search-land`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -372,17 +442,12 @@ const ChatPage = () => {
           typeof data.detail === "string"
             ? data.detail
             : JSON.stringify(data.detail, null, 2);
-
         throw new Error(errorMessage || "Error searching property.");
       }
 
       setMessages((prev) => [
         ...prev,
-        {
-          id: Date.now(),
-          sender: "ai",
-          data,
-        },
+        { id: Date.now(), sender: "ai", data },
       ]);
     } catch (err) {
       setMessages((prev) => [
@@ -399,23 +464,33 @@ const ChatPage = () => {
     }
   };
 
+  // Re-run financial metrics for a specific message when overrides change
+  const rerunFinancials = async (msgId, analyzeData) => {
+    const finPayload = buildFinancialPayload(analyzeData, finOverrides);
+    try {
+      const finRes = await fetch(`${API_BASE}/financial-metrics`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(finPayload),
+      });
+      const finData = await finRes.json().catch(() => null);
+
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === msgId
+            ? { ...m, finData: finRes.ok ? finData : null, finPayload }
+            : m
+        )
+      );
+    } catch {
+      // silently fail — keep stale finData
+    }
+  };
+
   const handleReset = () => {
-    setMessages([
-      {
-        id: 1,
-        sender: "ai",
-        text: "Choose a tool to get started.",
-      },
-    ]);
-
+    setMessages([{ id: 1, sender: "ai", text: "Choose a tool to get started." }]);
     setMode("analyze");
-
-    setDeal({
-      fullAddress: "",
-      purchasePrice: "",
-      rehabBudget: "",
-    });
-
+    setDeal({ fullAddress: "", purchasePrice: "", rehabBudget: "" });
     setLandSearch({
       zipCode: "",
       city: "",
@@ -429,6 +504,20 @@ const ChatPage = () => {
       includeListings: true,
       listingLimit: "25",
     });
+    setFinOverrides({
+      holdMonths: "12",
+      vacancyRate: "5",
+      expenseRate: "35",
+      saleClosingCostPct: "6",
+      riskFreeRate: "4.5",
+      beta: "0.7",
+      marketReturn: "10",
+      loanAmount: "",
+      annualDebtService: "",
+      equityValue: "",
+      taxRate: "0",
+    });
+    setActiveResultTab({});
   };
 
   const renderFormTitle = () => {
@@ -436,6 +525,8 @@ const ChatPage = () => {
     if (mode === "land") return "Property Search";
     return "Mystery";
   };
+
+  // ─── Renderers ────────────────────────────────────────────────────────────
 
   const renderOverviewCards = (data) => {
     const summary = [];
@@ -447,10 +538,7 @@ const ChatPage = () => {
         { label: "Estimated Rent", value: formatCurrency(ds.estimated_rent) },
         { label: "Total Basis", value: formatCurrency(ds.total_basis) },
         { label: "Spread to ARV", value: formatCurrency(ds.spread_to_arv) },
-        {
-          label: "70% Rule MAO",
-          value: formatCurrency(ds.mao_70_rule),
-        },
+        { label: "70% Rule MAO", value: formatCurrency(ds.mao_70_rule) },
         {
           label: "Gross Rent Cap Rate",
           value:
@@ -475,6 +563,38 @@ const ChatPage = () => {
     return (
       <div className="metric-grid">
         {summary.map((item) => (
+          <div className="metric-card" key={item.label}>
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderFinOverviewCards = (finData) => {
+    if (!finData) return null;
+
+    const irrBeatsWacc = finData.irr_beats_wacc;
+    const signal =
+      irrBeatsWacc === true
+        ? "✓ IRR clears WACC hurdle"
+        : irrBeatsWacc === false
+        ? "✗ IRR below WACC hurdle"
+        : null;
+
+    const cards = [
+      { label: "IRR (periodic)", value: finData.irr_percent !== null ? formatPct(finData.irr_percent) : "—" },
+      { label: "Return on Cost", value: finData.return_on_cost_percent !== null ? formatPct(finData.return_on_cost_percent) : "—" },
+      { label: "Cost of Equity (CAPM)", value: finData.cost_of_equity_percent_capm !== null ? formatPct(finData.cost_of_equity_percent_capm) : "—" },
+      { label: "Cost of Debt", value: finData.cost_of_debt_percent !== null ? formatPct(finData.cost_of_debt_percent) : "—" },
+      { label: "WACC", value: finData.wacc_percent !== null ? formatPct(finData.wacc_percent) : "—" },
+      ...(signal ? [{ label: "Decision Signal", value: signal }] : []),
+    ];
+
+    return (
+      <div className="metric-grid">
+        {cards.map((item) => (
           <div className="metric-card" key={item.label}>
             <span>{item.label}</span>
             <strong>{item.value}</strong>
@@ -524,7 +644,6 @@ const ChatPage = () => {
           <div className="result-list">
             {items.map((item, index) => {
               const entries = summarizeArrayItem(item);
-
               return (
                 <div className="result-card" key={`${title}-${index}`}>
                   {entries?.map(([key, value]) => (
@@ -542,10 +661,219 @@ const ChatPage = () => {
     );
   };
 
-  const renderAiData = (data) => {
+  // Financial assumptions panel with auto-generated values + override inputs
+  const renderFinAssumptions = (msgId, analyzeData, finPayload) => {
+    const ds = analyzeData?.deal_summary || {};
+    const autoMonthly = ds.estimated_rent
+      ? `Auto: $${formatNumber(Math.round(ds.estimated_rent))} / mo`
+      : null;
+
+    return (
+      <section className="result-section fin-assumptions">
+        <div className="result-section-title">Assumptions & Overrides</div>
+        <p className="fin-note">
+          Cash flows are auto-generated from estimated rent. Adjust any field and click
+          <strong> Recalculate</strong> to update.
+        </p>
+
+        <div className="info-grid">
+          <div className="form-group">
+            <label>Hold Period (months)</label>
+            <input
+              name="holdMonths"
+              type="number"
+              min="1"
+              value={finOverrides.holdMonths}
+              onChange={handleFinOverrideChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Vacancy Rate (%)</label>
+            <input
+              name="vacancyRate"
+              type="number"
+              min="0"
+              max="100"
+              step="0.5"
+              value={finOverrides.vacancyRate}
+              onChange={handleFinOverrideChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Operating Expense Rate (%)</label>
+            <input
+              name="expenseRate"
+              type="number"
+              min="0"
+              max="100"
+              step="0.5"
+              value={finOverrides.expenseRate}
+              onChange={handleFinOverrideChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Sale Closing Costs (%)</label>
+            <input
+              name="saleClosingCostPct"
+              type="number"
+              min="0"
+              max="20"
+              step="0.5"
+              value={finOverrides.saleClosingCostPct}
+              onChange={handleFinOverrideChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Risk-Free Rate (%){autoMonthly ? "" : ""}</label>
+            <input
+              name="riskFreeRate"
+              type="number"
+              step="0.1"
+              value={finOverrides.riskFreeRate}
+              onChange={handleFinOverrideChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Beta</label>
+            <input
+              name="beta"
+              type="number"
+              step="0.05"
+              min="0"
+              value={finOverrides.beta}
+              onChange={handleFinOverrideChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Expected Market Return (%)</label>
+            <input
+              name="marketReturn"
+              type="number"
+              step="0.5"
+              value={finOverrides.marketReturn}
+              onChange={handleFinOverrideChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Loan Amount (optional)</label>
+            <input
+              name="loanAmount"
+              type="number"
+              placeholder="e.g. 200000"
+              value={finOverrides.loanAmount}
+              onChange={handleFinOverrideChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Annual Debt Service (optional)</label>
+            <input
+              name="annualDebtService"
+              type="number"
+              placeholder="e.g. 14400"
+              value={finOverrides.annualDebtService}
+              onChange={handleFinOverrideChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Equity Value (optional)</label>
+            <input
+              name="equityValue"
+              type="number"
+              placeholder="e.g. 80000"
+              value={finOverrides.equityValue}
+              onChange={handleFinOverrideChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Tax Rate % (for WACC)</label>
+            <input
+              name="taxRate"
+              type="number"
+              min="0"
+              max="60"
+              step="1"
+              value={finOverrides.taxRate}
+              onChange={handleFinOverrideChange}
+            />
+          </div>
+        </div>
+
+        {autoMonthly && (
+          <p className="fin-note muted">
+            {autoMonthly} — vacancy & expense rates applied above
+          </p>
+        )}
+
+        <button
+          type="button"
+          className="recalc-button"
+          onClick={() => rerunFinancials(msgId, analyzeData)}
+        >
+          Recalculate
+        </button>
+      </section>
+    );
+  };
+
+  const renderFinTab = (msgId, finData, analyzeData, finPayload) => {
+    return (
+      <div className="result-panel">
+        {finData ? (
+          <>
+            {renderFinOverviewCards(finData)}
+
+            <section className="result-section">
+              <div className="result-section-title">Annualised IRR</div>
+              <div className="info-grid">
+                <div className="info-item">
+                  <span>Periodic IRR</span>
+                  <strong>
+                    {finData.irr_percent !== null ? formatPct(finData.irr_percent) : "—"}
+                  </strong>
+                </div>
+                <div className="info-item">
+                  <span>Annualised IRR</span>
+                  <strong>
+                    {finData.irr_percent !== null
+                      ? formatPct(
+                          ((1 + finData.irr_percent / 100) ** 12 - 1) * 100
+                        )
+                      : "—"}
+                  </strong>
+                </div>
+              </div>
+            </section>
+          </>
+        ) : (
+          <div className="result-empty">
+            Financial metrics unavailable — check that estimated rent and ARV were returned by
+            the analysis.
+          </div>
+        )}
+
+        {renderFinAssumptions(msgId, analyzeData, finPayload)}
+      </div>
+    );
+  };
+
+  const renderAiData = (msg) => {
+    const { id: msgId, data, finData, finPayload, analyzeData } = msg;
+
     if (!data || typeof data !== "object") {
       return <p>{String(data ?? "")}</p>;
     }
+
+    const isAnalyzeResult = !!data.deal_summary || !!data.subject_property;
 
     const subjectProperty = data.subject_property || null;
     const dealSummary = data.deal_summary || null;
@@ -561,7 +889,7 @@ const ChatPage = () => {
       ? data.rental_listings.response
       : [];
 
-    return (
+    const dealPanel = (
       <div className="result-panel">
         {renderOverviewCards(data)}
         {renderObjectGrid("Subject Property", subjectProperty)}
@@ -620,6 +948,41 @@ const ChatPage = () => {
               <pre className="raw-fallback">{JSON.stringify(data, null, 2)}</pre>
             </section>
           )}
+      </div>
+    );
+
+    // Land results — no tabs needed
+    if (!isAnalyzeResult) return dealPanel;
+
+    // Analyze results — tabbed
+    const currentTab = activeResultTab[msgId] || "deal";
+
+    return (
+      <div>
+        <div className="result-tabs">
+          <button
+            type="button"
+            className={`result-tab ${currentTab === "deal" ? "active" : ""}`}
+            onClick={() =>
+              setActiveResultTab((prev) => ({ ...prev, [msgId]: "deal" }))
+            }
+          >
+            Deal Analysis
+          </button>
+          <button
+            type="button"
+            className={`result-tab ${currentTab === "finance" ? "active" : ""}`}
+            onClick={() =>
+              setActiveResultTab((prev) => ({ ...prev, [msgId]: "finance" }))
+            }
+          >
+            Financial Metrics
+          </button>
+        </div>
+
+        {currentTab === "deal"
+          ? dealPanel
+          : renderFinTab(msgId, finData, analyzeData, finPayload)}
       </div>
     );
   };
@@ -841,7 +1204,7 @@ const ChatPage = () => {
                 <strong>{msg.sender === "user" ? "You" : "FlipBot"}</strong>
 
                 {msg.data ? (
-                  renderAiData(msg.data)
+                  renderAiData(msg)
                 ) : typeof msg.text === "object" ? (
                   <pre className="raw-fallback">{JSON.stringify(msg.text, null, 2)}</pre>
                 ) : (

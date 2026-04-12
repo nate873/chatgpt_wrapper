@@ -19,6 +19,7 @@ const LandingPage = () => {
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [query, setQuery] = useState("");
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const currentPhrase = PHRASES[phraseIndex];
 
@@ -39,6 +40,49 @@ const LandingPage = () => {
     return () => clearTimeout(timeout);
   }, [charIndex, isDeleting, phraseIndex, currentPhrase.length]);
 
+  useEffect(() => {
+    const elements = document.querySelectorAll(".reveal");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      {
+        threshold: 0.15,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const updateScrollProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      const progress = docHeight > 0 ? scrollTop / docHeight : 0;
+      setScrollProgress(progress * 100);
+    };
+
+    window.addEventListener("scroll", updateScrollProgress, { passive: true });
+    window.addEventListener("resize", updateScrollProgress);
+
+    updateScrollProgress();
+
+    return () => {
+      window.removeEventListener("scroll", updateScrollProgress);
+      window.removeEventListener("resize", updateScrollProgress);
+    };
+  }, []);
+
   const goToLogin = () => {
     window.location.href = "/login";
   };
@@ -49,12 +93,23 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
+      <div className="scroll-progress-track" aria-hidden="true">
+        <div
+          className="scroll-progress-bar"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
+
       <Header />
 
       <main className="landing-main">
         <div className="landing-content">
-          <section className="landing-hero">
-            <div className="hero-eyebrow">Real estate intelligence, simplified</div>
+
+          {/* HERO */}
+          <section className="landing-hero reveal">
+            <div className="hero-eyebrow">
+              Real estate intelligence, simplified
+            </div>
 
             <h1 className="hero-type">
               Analyze{" "}
@@ -103,7 +158,8 @@ const LandingPage = () => {
             </div>
           </section>
 
-          <section className="feature-showcase">
+          {/* FEATURE 1 */}
+          <section className="feature-showcase reveal">
             <div className="feature-copy">
               <div className="section-kicker">Property analysis</div>
               <h2>Analyze properties with comps, market rents, and deal signals</h2>
@@ -178,7 +234,8 @@ const LandingPage = () => {
             </div>
           </section>
 
-          <section className="feature-showcase reverse">
+          {/* FEATURE 2 */}
+          <section className="feature-showcase reverse reveal">
             <div className="feature-visual search-visual">
               <div className="mock-window search-main">
                 <div className="search-filters">
@@ -243,7 +300,8 @@ const LandingPage = () => {
             </div>
           </section>
 
-          <section className="feature-showcase">
+          {/* FEATURE 3 */}
+          <section className="feature-showcase reveal">
             <div className="feature-copy">
               <div className="section-kicker">Saved results and alerts</div>
               <h2>Save your results and get alerted when we find properties you may want</h2>
@@ -291,7 +349,8 @@ const LandingPage = () => {
             </div>
           </section>
 
-          <section className="cta-section">
+          {/* CTA */}
+          <section className="cta-section reveal">
             <div className="section-kicker">See it live</div>
 
             <h2 className="cta-title">
@@ -321,7 +380,8 @@ const LandingPage = () => {
             </div>
           </section>
 
-          <footer className="landing-footer">
+          {/* FOOTER */}
+          <footer className="landing-footer reveal">
             <div className="footer-inner">
               <span className="footer-copy">© 2026 FlipBot</span>
 
@@ -336,6 +396,7 @@ const LandingPage = () => {
               </div>
             </div>
           </footer>
+
         </div>
       </main>
     </div>
