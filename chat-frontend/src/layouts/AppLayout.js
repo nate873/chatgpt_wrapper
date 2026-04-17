@@ -2,21 +2,20 @@ import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
 
-const AppLayout = () => {
+const AppLayout = ({ requiresAuth = false }) => {
   const [user, setUser] = useState(null);
   const [plan, setPlan] = useState("free");
   const [credits, setCredits] = useState(null);
   const [stripeCustomerId, setStripeCustomerId] = useState(null);
 
-  // Load auth user
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data?.user ?? null);
     });
   }, []);
 
-  // Load profile data (SOURCE OF TRUTH)
   useEffect(() => {
     if (!user?.id) return;
 
@@ -30,7 +29,6 @@ const AppLayout = () => {
           console.error("Profile load error:", error);
           return;
         }
-
         if (data) {
           setPlan(data.plan);
           setCredits(data.credits_remaining);
@@ -39,27 +37,28 @@ const AppLayout = () => {
       });
   }, [user]);
 
+  const isLoggedIn = !!user?.id;
+
   return (
     <>
-      <Header user={user} plan={plan} credits={credits} />
+      {!isLoggedIn && <Header user={user} plan={plan} credits={credits} />}
 
-      <div className="app-shell">
-        
-          loggedIn={!!user}
-            userId={user?.id}     
-          onLogoutClick={async () => {
-            await supabase.auth.signOut();
-            setUser(null);
+      <div className="app-shell" style={{ display: "flex" }}>
+        {isLoggedIn && <Sidebar userId={user.id} />}
+
+        <main
+          className="app-main"
+          style={{
+            marginLeft: 0,
+            flex: 1,
           }}
-        
-
-        <main className="app-main">
+        >
           <Outlet
             context={{
               user,
               plan,
               credits,
-              stripeCustomerId, // ✅ restored
+              stripeCustomerId,
             }}
           />
         </main>

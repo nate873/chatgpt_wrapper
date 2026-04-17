@@ -33,8 +33,6 @@ const Header = ({ user, plan, credits }) => {
     navigate("/");
   };
 
- 
-
   useEffect(() => {
     if (!user?.id) {
       setDealSessions([]);
@@ -175,47 +173,56 @@ const Header = ({ user, plan, credits }) => {
           Pricing Plans
         </button>
 
-        <div className="account-menu" ref={accountMenuRef}>
+        {!user?.id ? (
           <button
-            className="account-avatar"
-            onClick={() => setOpen((prev) => !prev)}
+            className="upgrade-btn"
+            onClick={() => navigate("/login")}
           >
-            {user?.email?.[0]?.toUpperCase() || "U"}
+            Log In
           </button>
+        ) : (
+          <div className="account-menu" ref={accountMenuRef}>
+            <button
+              className="account-avatar"
+              onClick={() => setOpen((prev) => !prev)}
+            >
+              {user?.email?.[0]?.toUpperCase() || "U"}
+            </button>
 
-          {open && (
-            <div className="account-dropdown">
-              <div className="account-email">
-                {user?.email || "Not signed in"}
-              </div>
+            {open && (
+              <div className="account-dropdown">
+                <div className="account-email">
+                  {user?.email || "Not signed in"}
+                </div>
 
-              <div className="account-meta">
-                <span>
-                  Plan: <strong>{plan ?? "free"}</strong>
-                </span>
-                <span>
-                  Credits remaining: <strong>{credits ?? 0}</strong>
-                </span>
-              </div>
+                <div className="account-meta">
+                  <span>
+                    Plan: <strong>{plan ?? "free"}</strong>
+                  </span>
+                  <span>
+                    Credits remaining: <strong>{credits ?? 0}</strong>
+                  </span>
+                </div>
 
-              {plan === "free" && (
-                <button
-                  className="dropdown-btn primary"
-                  onClick={() => {
-                    setOpen(false);
-                    navigate("/pricing-plans");
-                  }}
-                >
-                  Start Free Trial
+                {plan === "free" && (
+                  <button
+                    className="dropdown-btn primary"
+                    onClick={() => {
+                      setOpen(false);
+                      navigate("/pricing-plans");
+                    }}
+                  >
+                    Start Free Trial
+                  </button>
+                )}
+
+                <button className="dropdown-btn" onClick={handleLogout}>
+                  Log out
                 </button>
-              )}
-
-              <button className="dropdown-btn" onClick={handleLogout}>
-                Log out
-              </button>
-            </div>
-          )}
-        </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );
