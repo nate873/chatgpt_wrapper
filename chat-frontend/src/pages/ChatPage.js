@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./ChatPage.css";
 import { saveProperty } from "./Saved";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = "flipbot.io";
 
 const DISTRESS_TYPES = [
   "All Types",
