@@ -19,6 +19,7 @@ import ChatPage from "./pages/ChatPage";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import OffMarketProperties from "./pages/OffMarketProperties";
 import OffMarketListing from "./pages/OffMarketListing";
+import Saved from "./pages/Saved";
 
 // ================= PROVIDER PAGES =================
 import ProviderDashboard from "./pages/ProviderDashboard";
@@ -36,67 +37,67 @@ import AdminRoute from "./components/AdminRoute";
 import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
-return ( <Routes>
+  return (
+    <Routes>
 
-```
-  {/* ================= PUBLIC (NO LAYOUT) ================= */}
-  <Route path="/" element={<LandingPage />} />
-  <Route path="/login" element={<LoginPage />} />
-  <Route path="/register" element={<RegisterPage />} />
+      {/* ================= PUBLIC (NO LAYOUT) ================= */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
-  {/* ================= PUBLIC (WITH APP LAYOUT) ================= */}
-  <Route element={<AppLayout />}>
-    <Route path="/about" element={<About />} />
-    <Route path="/affiliate-program" element={<AffiliateProgram />} />
-    <Route path="/pricing-plans" element={<PricingPlans />} />
-    <Route path="/contact" element={<ContactPage />} />
-    <Route path="/privacy" element={<PrivacyPolicyPage />} />
-    <Route path="/terms" element={<TermsPage />} />
+      {/* ================= PUBLIC (WITH APP LAYOUT) ================= */}
+      <Route element={<AppLayout />}>
+        <Route path="/about" element={<About />} />
+        <Route path="/affiliate-program" element={<AffiliateProgram />} />
+        <Route path="/pricing-plans" element={<PricingPlans />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
 
-    {/* NEW PAGES */}
-    <Route path="/realtors" element={<Realtors />} />
-    <Route path="/wholesalers" element={<Wholesalers />} />
+        {/* NEW PAGES */}
+        <Route path="/realtors" element={<Realtors />} />
+        <Route path="/wholesalers" element={<Wholesalers />} />
 
-    {/* OFF-MARKET */}
-    <Route path="/off-market" element={<OffMarketProperties />} />
-    <Route path="/off-market/:id" element={<OffMarketListing />} />
-  </Route>
+        {/* OFF-MARKET */}
+        <Route path="/off-market" element={<OffMarketProperties />} />
+        <Route path="/off-market/:id" element={<OffMarketListing />} />
+      </Route>
 
-  {/* ================= PROTECTED (AUTH REQUIRED) ================= */}
-  <Route
-    element={
-      <ProtectedRoute>
-        <AppLayout />
-      </ProtectedRoute>
-    }
-  >
-    <Route path="/chat" element={<ChatPage />} />
-    <Route path="/subscription" element={<SubscriptionPage />} />
+      {/* ================= PROTECTED (AUTH REQUIRED) ================= */}
+      <Route
+        element={
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/saved" element={<Saved />} />
+        <Route path="/subscription" element={<SubscriptionPage />} />
 
-    {/* ===== PROVIDER ROUTES ===== */}
-    <Route path="/provider" element={<ProviderDashboard />} />
-    <Route path="/provider/create" element={<CreateListing />} />
-  </Route>
+        {/* ===== PROVIDER ROUTES ===== */}
+        <Route path="/provider" element={<ProviderDashboard />} />
+        <Route path="/provider/create" element={<CreateListing />} />
+      </Route>
 
-  {/* ================= ADMIN (ADMIN ONLY) ================= */}
-  <Route
-    element={
-      <ProtectedRoute>
-        <AdminRoute>
-          <AppLayout />
-        </AdminRoute>
-      </ProtectedRoute>
-    }
-  >
-    <Route path="/admin/listings" element={<AdminListings />} />
-  </Route>
+      {/* ================= ADMIN (ADMIN ONLY) ================= */}
+      <Route
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <AppLayout />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/admin/listings" element={<AdminListings />} />
+      </Route>
 
-  {/* ================= FALLBACK ================= */}
-  <Route path="*" element={<NotFoundPage />} />
+      {/* ================= FALLBACK ================= */}
+      <Route path="*" element={<NotFoundPage />} />
 
-</Routes>
-
-);
+    </Routes>
+  );
 }
 
 export default App;
